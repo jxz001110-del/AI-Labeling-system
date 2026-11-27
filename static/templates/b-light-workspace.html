@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>模板 B · 浅色企业工作台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Noto+Serif+SC:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f6f4ef; --card:#fffefb; --ink:#17181a; --muted:#73726d; --line:#e2ded4;
+  --blue:#2447ff; --coral:#ff5a3c; --green:#1c8a5a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:'Instrument Sans','Noto Sans SC',sans-serif;
+  padding-bottom:40px;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent 0 23px,rgba(23,24,26,.022) 23px 24px);
+}
+.wrap{max-width:1440px;margin:0 auto;padding:0 34px;position:relative}
+header.top{display:flex;align-items:center;justify-content:space-between;height:92px;border-bottom:1px solid var(--ink)}
+.wordmark{display:flex;align-items:baseline;gap:12px}
+.wordmark strong{font:600 27px/1 'Newsreader','Noto Serif SC',serif;letter-spacing:-.03em}
+.wordmark span{font:500 10px/1 'Instrument Sans',sans-serif;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+nav{display:flex;gap:26px;font-size:13px;color:var(--muted)}
+nav a{color:inherit;text-decoration:none;padding:6px 0;border-bottom:1px solid transparent}
+nav a.on{color:var(--ink);border-color:var(--ink)}
+.user{display:flex;align-items:center;gap:12px;font-size:12px}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:600;font-size:12px}
+.hero{display:grid;grid-template-columns:1fr 300px;gap:34px;padding:34px 0 26px;align-items:end}
+.kicker{font:500 10px 'Instrument Sans',sans-serif;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+h1{font:500 42px/1.08 'Newsreader','Noto Serif SC',serif;letter-spacing:-.03em;margin-top:10px}
+h1 em{font-style:italic;color:var(--blue)}
+.hero p{font-size:13px;line-height:1.7;color:var(--muted);max-width:560px;margin-top:14px}
+.quick{display:flex;gap:10px;justify-content:flex-end}
+.btn{border:1px solid var(--ink);background:transparent;padding:11px 16px;font:600 12px 'Instrument Sans','Noto Sans SC',sans-serif;cursor:pointer}
+.btn:hover{background:var(--ink);color:var(--paper)}
+.btn.fill{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn.fill:hover{background:var(--blue);border-color:var(--blue)}
+.grid{display:grid;grid-template-columns:250px minmax(0,1fr) 330px;gap:22px;align-items:start}
+.panel{background:var(--card);border:1px solid var(--line)}
+.panel header{display:flex;justify-content:space-between;align-items:baseline;padding:16px 18px;border-bottom:1px solid var(--line)}
+.panel h2{font:600 14px 'Instrument Sans','Noto Sans SC',sans-serif}
+.panel header span{font:500 10px 'Instrument Sans',sans-serif;color:var(--muted);letter-spacing:.08em}
+.batch-list{padding:6px}
+.batch{
+  padding:13px 12px;border-left:3px solid transparent;cursor:pointer;
+  display:grid;gap:7px;
+}
+.batch:hover{background:#f8f6f1}
+.batch.on{border-color:var(--blue);background:#f3f5ff}
+.batch .line{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.batch b{font-size:12.5px;font-weight:600}
+.batch small{font-size:10.5px;color:var(--muted)}
+.batch .track{height:3px;background:#ece9e1;border-radius:2px;overflow:hidden}
+.batch .track i{display:block;height:100%;background:var(--blue)}
+.batch.on .track i{background:var(--coral)}
+.upload{
+  border:1px dashed #c9c4b7;background:#fbfaf6;padding:18px;display:flex;gap:14px;align-items:center;
+  margin:10px;cursor:pointer;
+}
+.upload:hover{border-color:var(--blue);background:#f4f6ff}
+.upload .plus{width:38px;height:38px;border:1px solid var(--ink);display:grid;place-items:center;font-size:20px;flex:none}
+.upload b{font-size:12.5px;display:block}
+.upload span{font-size:11px;color:var(--muted)}
+.center{display:grid;gap:22px}
+.images{padding:14px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.image{
+  border:1px solid var(--line);background:#f0eee8;cursor:pointer;position:relative;overflow:hidden;
+}
+.image img{width:100%;height:170px;object-fit:cover;display:block;filter:saturate(.8)}
+.image:hover{outline:2px solid var(--blue);outline-offset:-2px}
+.image .tag{position:absolute;left:8px;top:8px;background:var(--card);padding:4px 7px;font-size:10px;border:1px solid var(--line)}
+.image .foot{display:flex;justify-content:space-between;padding:8px 9px;background:var(--card);font-size:10.5px;color:var(--muted)}
+.image .foot b{color:var(--ink);font-weight:600}
+.image.done .tag{background:var(--green);color:#fff;border-color:var(--green)}
+.task{padding:18px}
+.ring{width:152px;height:152px;border-radius:50%;margin:4px auto 18px;display:grid;place-items:center;position:relative;
+  background:conic-gradient(var(--blue) 0 36%,#ece9e1 36% 100%);}
+.ring::after{content:"";position:absolute;inset:14px;border-radius:50%;background:var(--card)}
+.ring div{position:relative;text-align:center}
+.ring b{font:600 27px 'Newsreader',serif;display:block;line-height:1}
+.ring span{font-size:10px;color:var(--muted);letter-spacing:.08em}
+.task h3{font:600 16px 'Newsreader','Noto Serif SC',serif;margin-bottom:4px}
+.task p{font-size:11.5px;color:var(--muted);line-height:1.6;margin-bottom:16px}
+.type-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:11.5px}
+.type-row i{font-style:normal;color:var(--muted);font-size:10px}
+.swatch{width:8px;height:8px;display:inline-block;margin-right:7px}
+.dist{height:4px;background:#ece9e1;margin-top:5px}
+.dist i{display:block;height:100%;background:var(--coral)}
+.assign{margin-top:16px;border-top:1px solid var(--line);padding-top:14px;display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.assign b{color:var(--ink)}
+.notice{margin-top:14px;background:#fff4ef;border-left:3px solid var(--coral);padding:10px 12px;font-size:11px;line-height:1.6;color:#7a3a2a}
+.mark{position:fixed;left:16px;top:14px;z-index:60;font-size:10px;color:var(--muted);background:var(--paper);border:1px solid var(--line);padding:6px 8px}
+.mark a{color:var(--blue);text-decoration:none}
+@media(max-width:1080px){.grid{grid-template-columns:220px 1fr}.task-panel{display:none}.hero{grid-template-columns:1fr}.quick{justify-content:flex-start}}
+</style>
+</head>
+<body>
+<div class="mark">模板 B · 仅视觉预览 · <a href="/static/templates/">返回选择</a></div>
+<div class="wrap">
+  <header class="top">
+    <div class="wordmark"><strong>Surface</strong><span>Defect Annotation</span></div>
+    <nav><a class="on" href="#">批次</a><a href="#">模型</a><a href="#">缺陷类型</a><a href="#">标注员</a><a href="#">统计</a></nav>
+    <div class="user"><span>张三 · A001</span><div class="avatar">张</div></div>
+  </header>
+
+  <section class="hero">
+    <div>
+      <div class="kicker">Batch 18 / Bridge RGB / 3 images</div>
+      <h1>把 AI 的猜测，<br>变成<em>可交付的标签。</em></h1>
+      <p>AI 只负责框出可疑区域，缺陷类型由人工逐框确认。当前批次已检测 3 张图、28 个候选框，等待复核。</p>
+    </div>
+    <div class="quick">
+      <button class="btn">查看统计</button>
+      <button class="btn fill">导出本批</button>
+    </div>
+  </section>
+
+  <div class="grid">
+    <aside class="panel">
+      <header><h2>批次</h2><span>07 TOTAL</span></header>
+      <div class="batch-list">
+        <div class="batch on"><div class="line"><b>桥梁 RGB · 第 18 批</b><small>28</small></div><div class="track"><i style="width:64%"></i></div><small>Grounding DINO · 待确认 28</small></div>
+        <div class="batch"><div class="line"><b>OWLv2 试用</b><small>26</small></div><div class="track"><i style="width:24%"></i></div><small>OWLv2 · 待确认 26</small></div>
+        <div class="batch"><div class="line"><b>YOLOE 候选框</b><small>5</small></div><div class="track"><i style="width:100%;background:var(--green)"></i></div><small>YOLOE · 已完成</small></div>
+        <div class="batch"><div class="line"><b>中文缺陷检测</b><small>42</small></div><div class="track"><i style="width:100%;background:var(--green)"></i></div><small>已完成 · 已导出</small></div>
+      </div>
+      <div class="upload">
+        <div class="plus">＋</div>
+        <div><b>批量导入图片</b><span>拖拽或选择，支持 JPG / PNG</span></div>
+      </div>
+    </aside>
+
+    <section class="center">
+      <div class="panel">
+        <header><h2>图片队列</h2><span>3 张 · 按上传顺序</span></header>
+        <div class="images">
+          <div class="image">
+            <img src="/api/images/288/file" alt="待标注图片">
+            <span class="tag">待确认 6</span>
+            <div class="foot"><b>0003.JPG</b><span>640 × 512</span></div>
+          </div>
+          <div class="image">
+            <img src="/api/images/289/file" alt="待标注图片">
+            <span class="tag">待确认 12</span>
+            <div class="foot"><b>0004.JPG</b><span>640 × 512</span></div>
+          </div>
+          <div class="image">
+            <img src="/api/images/290/file" alt="待标注图片">
+            <span class="tag">待确认 10</span>
+            <div class="foot"><b>0005.JPG</b><span>640 × 512</span></div>
+          </div>
+          <div class="image done">
+            <img src="/api/images/289/file" alt="已完成图片" style="filter:grayscale(.6)">
+            <span class="tag">已完成</span>
+            <div class="foot"><b>0006.JPG</b><span>已接受 9</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <header><h2>最近操作</h2><span>LIVE LOG</span></header>
+        <div style="padding:4px 18px 14px">
+          <div class="type-row"><span><span class="swatch" style="background:var(--blue)"></span>张三 接受「裂缝」框 #04</span><i>刚刚</i></div>
+          <div class="type-row"><span><span class="swatch" style="background:var(--coral)"></span>张三 标记「不是缺陷」框 #03</span><i>2 分钟前</i></div>
+          <div class="type-row"><span><span class="swatch" style="background:var(--green)"></span>系统 完成 AI 候选框检测</span><i>18 分钟前</i></div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="panel task-panel">
+      <header><h2>本批进度</h2><span>BATCH 18</span></header>
+      <div class="task">
+        <div class="ring"><div><b>36%</b><span>已处理 10 / 28</span></div></div>
+        <h3>继续复核</h3>
+        <p>当前第 1 张图，还有 6 个待确认框。建议先处理高置信度候选。</p>
+        <div class="type-row"><span><span class="swatch" style="background:#2447ff"></span>裂缝</span><i>8</i></div><div class="dist"><i style="width:72%"></i></div>
+        <div class="type-row"><span><span class="swatch" style="background:#ff5a3c"></span>脱落</span><i>3</i></div><div class="dist"><i style="width:34%"></i></div>
+        <div class="type-row"><span><span class="swatch" style="background:#1c8a5a"></span>露筋</span><i>1</i></div><div class="dist"><i style="width:14%"></i></div>
+        <div class="assign"><span>标注员 <b>张三</b></span><span>模型 <b>GDINO-T</b></span></div>
+        <div class="notice">提示：AI 未预填类型，所有类型均由人工判定；可随时切换标注员。</div>
+      </div>
+    </aside>
+  </div>
+</div>
+<script>
+document.querySelectorAll('.batch').forEach(item=>item.addEventListener('click',()=>{
+  document.querySelectorAll('.batch').forEach(other=>other.classList.remove('on'));
+  item.classList.add('on');
+}));
+</script>
+</body>
+</html>

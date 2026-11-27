@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>缺陷标注系统 · 前端模板选择</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f4f1ea;--ink:#181a19;--muted:#767770;--line:#dcd7cc;--blue:#2447ff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:'Instrument Sans','Noto Sans SC',sans-serif;padding:54px 40px 70px}
+.shell{max-width:1180px;margin:0 auto}
+.kicker{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+h1{font:500 54px/1 'Newsreader',serif;letter-spacing:-.04em;margin:14px 0 12px}
+h1 em{font-style:italic;color:var(--blue)}
+.lead{max-width:640px;font-size:13px;line-height:1.8;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px}
+.card{background:#fffefb;border:1px solid var(--line);padding:22px;display:flex;flex-direction:column;gap:14px;position:relative;transition:.2s}
+.card:hover{transform:translateY(-4px);box-shadow:0 22px 40px rgba(24,26,25,.09)}
+.alpha{font:600 64px/.8 'Newsreader',serif;color:var(--line)}
+.card h2{font:600 20px/1.2 'Instrument Sans','Noto Sans SC',sans-serif;letter-spacing:-.02em}
+.card p{font-size:12px;line-height:1.7;color:var(--muted);flex:1}
+.swatches{display:flex;gap:6px}
+.swatches i{width:22px;height:22px;display:block;border:1px solid rgba(0,0,0,.06)}
+.card a{display:inline-flex;justify-content:space-between;align-items:center;text-decoration:none;color:var(--ink);border-top:1px solid var(--line);padding-top:12px;font:600 12px 'Instrument Sans','Noto Sans SC',sans-serif}
+.card a:hover{color:var(--blue)}
+.card a span{font-size:14px}
+.tag{position:absolute;right:18px;top:18px;font-size:9px;letter-spacing:.1em;color:var(--muted);border:1px solid var(--line);padding:4px 6px}
+.note{margin-top:34px;border-top:1px solid var(--line);padding-top:18px;display:flex;justify-content:space-between;gap:24px;font-size:11px;color:var(--muted);line-height:1.7}
+.note b{color:var(--ink);font-weight:600}
+@media(max-width:900px){.cards{grid-template-columns:1fr}h1{font-size:42px}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="kicker">Defect Labeler / Frontend Directions</div>
+  <h1>三套页面气质，<em>同一条标注流程。</em></h1>
+  <p class="lead">都是可点击的视觉模板：批量批次、候选框复核、类型判定、统计导出。数据为示例，未接入真实接口。选定一套后我再把它落进现有系统，不改动后端流程。</p>
+
+  <div class="cards">
+    <article class="card">
+      <span class="tag">DARK / INDUSTRIAL</span>
+      <div class="alpha">A</div>
+      <h2>深色工业工具台</h2>
+      <p>左轨导航、三栏高密度布局、琥珀色状态强调。适合长时间坐在工位上连续复核，信息一眼扫完。</p>
+      <div class="swatches"><i style="background:#0c0f10"></i><i style="background:#14191b"></i><i style="background:#f5a83c"></i><i style="background:#6fd3ad"></i></div>
+      <a href="/static/templates/a-command-center.html">打开模板 A <span>→</span></a>
+    </article>
+
+    <article class="card">
+      <span class="tag">LIGHT / EDITORIAL</span>
+      <div class="alpha">B</div>
+      <h2>浅色企业工作台</h2>
+      <p>纸张质感、衬线标题、蓝色主操作。更像一套正式的内部系统，适合汇报、培训和多人协作。</p>
+      <div class="swatches"><i style="background:#f6f4ef"></i><i style="background:#fffefb"></i><i style="background:#2447ff"></i><i style="background:#ff5a3c"></i></div>
+      <a href="/static/templates/b-light-workspace.html">打开模板 B <span>→</span></a>
+    </article>
+
+    <article class="card">
+      <span class="tag">DARK / CANVAS FIRST</span>
+      <div class="alpha">C</div>
+      <h2>图像优先复核台</h2>
+      <p>图片占满视野，工具悬浮、荧光绿框。最少界面干扰，适合逐框快速判断，像专业修图/影像软件。</p>
+      <div class="swatches"><i style="background:#0b0d0c"></i><i style="background:#121614"></i><i style="background:#c9ff4d"></i><i style="background:#81a8ff"></i></div>
+      <a href="/static/templates/c-canvas-first.html">打开模板 C <span>→</span></a>
+    </article>
+  </div>
+
+  <div class="note">
+    <div><b>关于预览：</b>模板里使用当前批次 #18 的真实桥梁图片，仅做视觉示意；按钮、下拉和统计为静态示例。</div>
+    <div><b>下一步：</b>告诉我选 A / B / C，或把喜欢的部分组合，我会把它接进现有页面。</div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,10 @@
+# 标注服务运行产物，不提交仓库
+__pycache__/
+*.py[cod]
+data/
+exports/
+models/*
+*.pt
+*.onnx
+*.engine
+mobileclip2_b.ts

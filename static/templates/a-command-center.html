@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>模板 A · 深色工业工具台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c0f10; --panel:#14191b; --panel-2:#191f22; --line:#263033;
+  --ink:#e8edee; --muted:#8b9a9e; --dim:#5c6a6e;
+  --amber:#f5a83c; --mint:#6fd3ad; --red:#ff6b6b;
+  --mono:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:'Manrope','Noto Sans SC',sans-serif;
+  overflow:hidden;
+}
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:50; opacity:.25;
+  background-image:radial-gradient(rgba(255,255,255,.12) .5px, transparent .5px);
+  background-size:3px 3px; mix-blend-mode:overlay;
+}
+.shell{display:grid; grid-template-columns:76px 1fr; height:100vh}
+.rail{
+  border-right:1px solid var(--line); background:#0a0d0e;
+  display:flex; flex-direction:column; align-items:center; padding:18px 0; gap:8px;
+}
+.brand{
+  width:42px;height:42px;border:1px solid var(--amber);color:var(--amber);
+  display:grid;place-items:center;font:800 13px/1 var(--mono);letter-spacing:.08em;
+  margin-bottom:22px; position:relative;
+}
+.brand::after{content:"";position:absolute;inset:4px;border:1px solid rgba(245,168,60,.3)}
+.rail button{
+  width:44px;height:44px;background:transparent;border:1px solid transparent;color:var(--dim);
+  cursor:pointer;font:600 10px/1 var(--mono);letter-spacing:.04em;
+}
+.rail button:hover{color:var(--ink);border-color:var(--line)}
+.rail button.on{color:var(--amber);border-color:rgba(245,168,60,.4);background:rgba(245,168,60,.06)}
+.rail .spacer{flex:1}
+.rail .dot{width:6px;height:6px;background:var(--mint);box-shadow:0 0 10px var(--mint);margin-bottom:8px}
+.main{display:flex;flex-direction:column;min-width:0}
+.top{
+  height:88px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;padding:0 28px;gap:24px;
+}
+.eyebrow{font:500 10px/1 var(--mono);letter-spacing:.16em;color:var(--dim);text-transform:uppercase}
+h1{font-size:24px;letter-spacing:-.02em;font-weight:800;margin-top:7px}
+.top-actions{display:flex;align-items:center;gap:10px}
+.pill{
+  font:500 11px/1 var(--mono);color:var(--muted);border:1px solid var(--line);
+  padding:9px 12px;background:var(--panel);
+}
+.pill b{color:var(--ink);font-weight:500}
+.btn{
+  border:1px solid var(--line);background:transparent;color:var(--ink);
+  padding:9px 14px;font:600 12px/1 'Manrope','Noto Sans SC',sans-serif;cursor:pointer;
+}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--amber);border-color:var(--amber);color:#171207}
+.layout{
+  flex:1;display:grid;grid-template-columns:248px minmax(0,1fr) 316px;
+  gap:1px;background:var(--line);min-height:0;
+}
+.card{background:var(--panel);min-height:0;display:flex;flex-direction:column}
+.batches{padding:18px 14px}
+.batches header{display:flex;justify-content:space-between;align-items:baseline;padding:0 4px 14px}
+.batches h2{font-size:13px;letter-spacing:.02em}
+.batches header span{font:500 10px var(--mono);color:var(--dim)}
+.batch{
+  padding:12px 10px;border:1px solid transparent;cursor:pointer;margin-bottom:6px;
+  display:grid;gap:8px;
+}
+.batch:hover{border-color:var(--line);background:var(--panel-2)}
+.batch.on{border-color:rgba(245,168,60,.45);background:linear-gradient(90deg,rgba(245,168,60,.1),transparent)}
+.batch .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.batch b{font-size:12px;font-weight:600}
+.batch small{font:400 10px var(--mono);color:var(--dim)}
+.bar{height:2px;background:#222a2d;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--amber)}
+.batch.on .bar i{background:var(--mint)}
+.new-batch{
+  margin-top:auto;border:1px dashed var(--line);background:transparent;color:var(--muted);
+  padding:12px;font:600 12px 'Manrope','Noto Sans SC',sans-serif;cursor:pointer;
+}
+.new-batch:hover{color:var(--amber);border-color:rgba(245,168,60,.4)}
+.canvas{background:#0a0d0e}
+.canvas-head{
+  height:54px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;border-bottom:1px solid var(--line);gap:12px;
+}
+.filename{font:500 11px var(--mono);color:var(--muted)}
+.chips{display:flex;gap:6px}
+.chip{font:500 10px var(--mono);padding:5px 8px;border:1px solid var(--line);color:var(--dim)}
+.chip.hot{color:var(--mint);border-color:rgba(111,211,173,.35)}
+.zoom{display:flex;gap:4px}
+.zoom button{width:28px;height:28px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer}
+.stage{position:relative;flex:1;min-height:0;display:grid;place-items:center;padding:22px;overflow:hidden}
+.stage::before{
+  content:"";position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+.stage img{max-width:100%;max-height:100%;object-fit:contain;filter:saturate(.75) contrast(1.05);position:relative}
+.bbox{position:absolute;border:1.5px solid var(--amber);cursor:pointer;transition:.15s}
+.bbox::before{content:attr(data-label);position:absolute;left:-1px;top:-22px;background:var(--amber);color:#171207;font:600 10px/1 var(--mono);padding:5px 6px;white-space:nowrap}
+.bbox.b1{left:29%;top:48%;width:17%;height:19%}
+.bbox.b2{left:57%;top:8%;width:11%;height:9%;border-color:#7ea6ff}
+.bbox.b2::before{background:#7ea6ff}
+.bbox.b3{left:55%;top:56%;width:15%;height:22%;border-color:var(--mint)}
+.bbox.b3::before{background:var(--mint)}
+.bbox.active{box-shadow:0 0 0 9999px rgba(0,0,0,.18),0 0 0 3px rgba(245,168,60,.18)}
+.bbox:hover{transform:scale(1.01)}
+.stage-hud{position:absolute;left:22px;bottom:18px;display:flex;gap:14px;font:500 10px var(--mono);color:var(--dim)}
+.filmstrip{height:84px;border-top:1px solid var(--line);display:flex;gap:8px;padding:10px 14px;overflow:hidden}
+.thumb{
+  width:92px;border:1px solid var(--line);background:var(--panel-2);position:relative;cursor:pointer;flex:none;
+  background-size:cover;background-position:center;filter:grayscale(.3) brightness(.75);
+}
+.thumb.on{border-color:var(--amber);filter:none}
+.thumb span{position:absolute;left:4px;bottom:4px;font:500 9px var(--mono);background:rgba(0,0,0,.65);padding:2px 4px}
+.inspector{border-left:1px solid var(--line);background:var(--panel-2)}
+.ins-head{padding:18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.ins-head h3{font:700 15px 'Manrope','Noto Sans SC',sans-serif}
+.state{font:500 9px var(--mono);letter-spacing:.1em;color:var(--amber);border:1px solid rgba(245,168,60,.4);padding:4px 6px}
+.ins-body{padding:16px 18px;display:flex;flex-direction:column;gap:18px}
+.label{font:500 9px var(--mono);letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin-bottom:8px}
+.types{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.types button{
+  border:1px solid var(--line);background:transparent;color:var(--muted);padding:10px 8px;
+  font:600 12px 'Manrope','Noto Sans SC',sans-serif;cursor:pointer;text-align:left;display:flex;justify-content:space-between;
+}
+.types button:hover{color:var(--ink);border-color:var(--muted)}
+.types button.on{border-color:var(--amber);color:var(--amber);background:rgba(245,168,60,.08)}
+.types i{font:500 9px var(--mono);font-style:normal;color:var(--dim)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto}
+.actions .accept{grid-column:1/-1;background:var(--mint);border:none;color:#06130e;padding:13px;font:700 13px 'Manrope','Noto Sans SC',sans-serif;cursor:pointer}
+.actions .reject{border:1px solid #3a2626;color:#ff9b9b;background:rgba(255,107,107,.05);padding:11px;font:600 12px 'Manrope','Noto Sans SC',sans-serif;cursor:pointer}
+.meta{border-top:1px solid var(--line);padding-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;font:400 10px var(--mono);color:var(--dim)}
+.meta b{display:block;color:var(--muted);font-weight:500;margin-top:3px}
+.stats{
+  height:62px;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);
+  background:#0a0d0e;
+}
+.stat{padding:10px 22px;border-right:1px solid var(--line);display:flex;flex-direction:column;justify-content:center;gap:3px}
+.stat span{font:500 9px var(--mono);letter-spacing:.1em;color:var(--dim);text-transform:uppercase}
+.stat b{font:700 17px 'Manrope','Noto Sans SC',sans-serif}
+.stat b small{font:500 10px var(--mono);color:var(--dim);margin-left:4px}
+.mark{position:fixed;right:16px;top:12px;z-index:60;font:500 9px var(--mono);color:#7f8d90;background:#0a0d0e;border:1px solid var(--line);padding:5px 7px}
+.mark a{color:var(--amber);text-decoration:none}
+@media(max-width:1100px){.layout{grid-template-columns:210px 1fr}.inspector{display:none}}
+</style>
+</head>
+<body>
+<div class="mark">模板 A · 仅视觉预览 · <a href="/static/templates/">返回选择</a></div>
+<div class="shell">
+  <aside class="rail">
+    <div class="brand">DL</div>
+    <button class="on">批次</button>
+    <button>模型</button>
+    <button>类型</button>
+    <button>统计</button>
+    <div class="spacer"></div>
+    <div class="dot"></div>
+    <button>退出</button>
+  </aside>
+  <div class="main">
+    <header class="top">
+      <div>
+        <div class="eyebrow">BATCH 18 / BRIDGE RGB / 3 IMAGES</div>
+        <h1>缺陷复核台</h1>
+      </div>
+      <div class="top-actions">
+        <span class="pill">模型 <b>Grounding DINO Tiny</b></span>
+        <span class="pill">标注员 <b>张三 / A001</b></span>
+        <button class="btn">统计</button>
+        <button class="btn primary">导出本批</button>
+      </div>
+    </header>
+    <div class="layout">
+      <section class="card batches">
+        <header><h2>批次列表</h2><span>07</span></header>
+        <div class="batch on">
+          <div class="row"><b>桥梁 RGB · 第 18 批</b><small>28 框</small></div>
+          <div class="bar"><i style="width:64%"></i></div>
+          <small>待确认 28 · 已接受 0</small>
+        </div>
+        <div class="batch">
+          <div class="row"><b>OWLv2 试用</b><small>26 框</small></div>
+          <div class="bar"><i style="width:22%"></i></div>
+          <small>待确认 26 · 已接受 0</small>
+        </div>
+        <div class="batch">
+          <div class="row"><b>YOLOE 候选框</b><small>5 框</small></div>
+          <div class="bar"><i style="width:100%;background:var(--mint)"></i></div>
+          <small>已完成 · 已接受 5</small>
+        </div>
+        <div class="batch">
+          <div class="row"><b>自测批次 · 可见光</b><small>42 框</small></div>
+          <div class="bar"><i style="width:100%;background:var(--mint)"></i></div>
+          <small>已完成 · 已导出</small>
+        </div>
+        <button class="new-batch">＋ 新建批次</button>
+      </section>
+
+      <section class="card canvas">
+        <div class="canvas-head">
+          <div class="filename">DJI_20250624181809_0003.JPG</div>
+          <div class="chips"><span class="chip hot">640 × 512</span><span class="chip">6 框</span><span class="chip">待确认</span></div>
+          <div class="zoom"><button>−</button><button>1:1</button><button>＋</button></div>
+        </div>
+        <div class="stage">
+          <img src="/api/images/288/file" alt="待标注桥梁图片">
+          <div class="bbox b1 active" data-label="裂缝 0.87"></div>
+          <div class="bbox b2" data-label="露筋 0.66"></div>
+          <div class="bbox b3" data-label="脱落 0.54"></div>
+          <div class="stage-hud"><span>ZOOM 100%</span><span>BOX 03 / 06</span><span>GPU CUDA:0</span></div>
+        </div>
+        <div class="filmstrip">
+          <div class="thumb on" style="background-image:url('/api/images/288/file')"><span>01</span></div>
+          <div class="thumb" style="background-image:url('/api/images/289/file')"><span>02</span></div>
+          <div class="thumb" style="background-image:url('/api/images/290/file')"><span>03</span></div>
+        </div>
+      </section>
+
+      <aside class="card inspector">
+        <div class="ins-head"><h3>框 #03</h3><span class="state">待确认</span></div>
+        <div class="ins-body">
+          <div>
+            <div class="label">缺陷类型 / 键盘 1-7</div>
+            <div class="types">
+              <button class="on">裂缝 <i>1</i></button>
+              <button>露筋 <i>2</i></button>
+              <button>脱落 <i>3</i></button>
+              <button>缺棱断角 <i>4</i></button>
+              <button>露筋锈蚀 <i>5</i></button>
+              <button>断裂 <i>6</i></button>
+              <button>蜂窝麻面 <i>7</i></button>
+              <button>不是缺陷</button>
+            </div>
+          </div>
+          <div>
+            <div class="label">AI 建议</div>
+            <div class="pill" style="display:inline-block">crack · 0.87</div>
+          </div>
+          <div class="meta">
+            <div>坐标 X1 / Y1<b>188, 246</b></div>
+            <div>坐标 X2 / Y2<b>298, 344</b></div>
+            <div>框面积<b>11,880 px²</b></div>
+            <div>标注员<b>张三</b></div>
+          </div>
+          <div class="actions">
+            <button class="accept">接受并下一框 →</button>
+            <button class="reject">不是缺陷</button>
+            <button class="btn">重置</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+    <footer class="stats">
+      <div class="stat"><span>图片</span><b>3 <small>张</small></b></div>
+      <div class="stat"><span>候选框</span><b>28 <small>个</small></b></div>
+      <div class="stat"><span>待确认</span><b style="color:var(--amber)">28</b></div>
+      <div class="stat"><span>接受率</span><b>—</b></div>
+      <div class="stat"><span>平均置信度</span><b>0.16</b></div>
+    </footer>
+  </div>
+</div>
+<script>
+document.querySelectorAll('.bbox').forEach(box=>box.addEventListener('click',()=>{
+  document.querySelectorAll('.bbox').forEach(item=>item.classList.remove('active'));
+  box.classList.add('active');
+}));
+document.querySelectorAll('.types button').forEach(btn=>btn.addEventListener('click',()=>{
+  document.querySelectorAll('.types button').forEach(item=>item.classList.remove('on'));
+  btn.classList.add('on');
+}));
+document.querySelectorAll('.batch').forEach(item=>item.addEventListener('click',()=>{
+  document.querySelectorAll('.batch').forEach(other=>other.classList.remove('on'));
+  item.classList.add('on');
+}));
+</script>
+</body>
+</html>

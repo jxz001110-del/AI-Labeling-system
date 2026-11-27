@@ -1,0 +1,1933 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>缺陷标注台</title>
+<style>
+  :root{
+    --bg:#090c13; --panel:#111825; --panel2:#162133; --line:#223049;
+    --text:#e8eefb; --muted:#8ea0bb; --muted2:#63748f;
+    --accent:#5b8dff; --accent-soft:rgba(91,141,255,.16);
+    --ok:#25c26e; --warn:#f5a524; --danger:#ff5b6e;
+    --radius:14px; --shadow:0 18px 44px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1100px 600px at 8% -10%, rgba(91,141,255,.12), transparent 60%),
+      radial-gradient(900px 520px at 100% 0%, rgba(37,194,110,.07), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:"Segoe UI","Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+    font-size:14px; line-height:1.55; min-height:100vh;
+  }
+  h1,h2,h3,p{margin:0}
+  button{font-family:inherit}
+  input,select,button{font-size:13px}
+  input[type=text],input[type=number],select{
+    background:#0d1420;border:1px solid var(--line);color:var(--text);
+    border-radius:9px;padding:8px 10px;outline:none;transition:border-color .15s;
+  }
+  input[type=text]:focus,input[type=number]:focus,select:focus{border-color:var(--accent)}
+  input[type=color]{background:#0d1420;border:1px solid var(--line);border-radius:9px;height:34px;width:44px;padding:2px;cursor:pointer}
+  input[type=range]{accent-color:var(--accent)}
+  .btn{
+    appearance:none;border:1px solid var(--line);background:var(--panel2);color:var(--text);
+    padding:8px 14px;border-radius:9px;cursor:pointer;transition:.15s;white-space:nowrap;
+  }
+  .btn:hover{border-color:#32476b;background:#1b2a42}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#06101f;font-weight:600}
+  .btn.primary:hover{background:#7aa4ff}
+  .btn.ghost{background:transparent}
+  .btn.small{padding:5px 10px;font-size:12px;border-radius:8px}
+  .btn.danger{color:#ffb3bd;border-color:#573043}
+  .btn.danger:hover{background:#2a1620}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .muted{color:var(--muted)}
+  .hint{color:var(--muted2);font-size:12px}
+  header.topbar{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:18px 26px 12px;
+  }
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{
+    width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+    background:linear-gradient(135deg,#5b8dff,#25c26e);color:#06101f;font-weight:800;font-size:18px;
+  }
+  .brand h1{font-size:17px;letter-spacing:.5px}
+  .brand p{font-size:12px;color:var(--muted)}
+  .top-right{display:flex;gap:8px;flex-wrap:wrap}
+  .badge{
+    border:1px solid var(--line);background:var(--panel);padding:5px 11px;border-radius:999px;
+    font-size:12px;color:var(--muted);
+  }
+  .badge strong{color:var(--text);font-weight:600}
+  .badge.ok{border-color:#1d5c3f;color:#7ee2ab}
+  .badge.warn{border-color:#6b5220;color:#ffd27a}
+  .badge select{
+    background:#0d1420;border:1px solid var(--line);color:var(--text);
+    border-radius:6px;padding:2px 5px;font-size:11.5px;max-width:150px;margin-left:6px;
+  }
+  nav.tabs{display:flex;gap:6px;padding:0 26px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  nav.tabs button{
+    background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);
+    padding:10px 14px;cursor:pointer;font-size:13.5px;border-radius:8px 8px 0 0;
+  }
+  nav.tabs button:hover{color:var(--text);background:rgba(255,255,255,.02)}
+  nav.tabs button.active{color:var(--text);border-bottom-color:var(--accent);font-weight:600}
+  main{padding:22px 26px 60px;max-width:1560px;margin:0 auto}
+  .grid-2{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:18px}
+  @media (max-width:1020px){.grid-2{grid-template-columns:1fr}}
+  .card{
+    background:linear-gradient(180deg,rgba(255,255,255,.015),transparent),var(--panel);
+    border:1px solid var(--line);border-radius:var(--radius);padding:18px;
+  }
+  .card + .card{margin-top:18px}
+  .card h2{
+    font-size:14px;font-weight:600;letter-spacing:.3px;margin-bottom:14px;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+  }
+  .card h2 .sub{font-weight:400;color:var(--muted2);font-size:12px}
+  .form-grid{display:grid;gap:12px}
+  .field{display:grid;gap:6px}
+  .field > span{font-size:12px;color:var(--muted)}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .field-row .field{gap:4px}
+  .field-val{color:var(--accent);font-weight:600}
+  .model-list{display:grid;gap:10px;max-height:420px;overflow:auto;padding-right:4px}
+  .model-item{border:1px solid var(--line);border-radius:11px;padding:11px 13px;background:#0d1420}
+  .mi-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .mi-meta{font-size:11.5px;color:var(--muted2);margin-top:2px}
+  .mi-classes{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+  .mi-classes span{
+    font-size:11px;color:#b9c9e4;background:#182338;border:1px solid #243452;
+    padding:1px 7px;border-radius:999px;
+  }
+  .pill{font-size:11px;padding:1px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+  .pill.ok{color:#7ee2ab;border-color:#1d5c3f;background:rgba(37,194,110,.08)}
+  .pill.warn{color:#ffd27a;border-color:#6b5220;background:rgba(245,165,36,.08)}
+  .pill.err{color:#ff9aa6;border-color:#5c2330;background:rgba(255,91,110,.08)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+  th{font-size:11.5px;color:var(--muted2);font-weight:500;letter-spacing:.4px}
+  tbody tr:hover{background:rgba(255,255,255,.02)}
+  .table-wrap{overflow:auto}
+  .empty{padding:26px;text-align:center;color:var(--muted2);border:1px dashed var(--line);border-radius:11px;font-size:13px}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
+  .work-head{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between}
+  .work-title{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .work-title h2{font-size:16px;margin:0}
+  .work-meta{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;color:var(--muted);font-size:12px}
+  .work-meta b{color:var(--text);font-weight:600}
+  .actions{display:flex;gap:8px;flex-wrap:wrap}
+  .progress-wrap{margin-top:14px}
+  .progress-head{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px}
+  .bar{height:7px;border-radius:999px;background:#0b111c;border:1px solid var(--line);overflow:hidden}
+  .bar > div{height:100%;background:linear-gradient(90deg,#5b8dff,#25c26e);width:0%;transition:width .4s}
+  .dropzone{
+    margin-top:14px;border:1px dashed #2b3c59;border-radius:12px;padding:18px;text-align:center;
+    color:var(--muted);cursor:pointer;transition:.15s;background:rgba(91,141,255,.03);
+  }
+  .dropzone:hover,.dropzone.drag{border-color:var(--accent);background:var(--accent-soft);color:var(--text)}
+  .image-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-top:16px}
+  .img-card{
+    border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#0c131f;cursor:pointer;
+    transition:.15s;
+  }
+  .img-card:hover{border-color:#3a5480;transform:translateY(-1px)}
+  .thumb{position:relative;height:130px;background:#070b12;display:grid;place-items:center;overflow:hidden}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .thumb .st{position:absolute;left:8px;top:8px}
+  .ic-body{padding:8px 10px 10px;display:grid;gap:3px}
+  .ic-name{font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ic-meta{font-size:11px;color:var(--muted2)}
+  .st{font-size:10.5px;padding:1px 8px;border-radius:999px;background:#16233a;border:1px solid #22314c;color:#a9bcd9}
+  .st.done{color:#7ee2ab;border-color:#1d5c3f;background:rgba(37,194,110,.12)}
+  .st.pending{color:#ffd27a;border-color:#6b5220;background:rgba(245,165,36,.12)}
+  .st.err{color:#ff9aa6;border-color:#5c2330;background:rgba(255,91,110,.12)}
+  .st.ai{color:#9bb6ff;border-color:#2f4a7d;background:rgba(91,141,255,.12)}
+  /* 统计 */
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .stat{background:#0d1420;border:1px solid var(--line);border-radius:12px;padding:14px}
+  .stat .k{font-size:11.5px;color:var(--muted2)}
+  .stat .v{font-size:24px;font-weight:700;margin-top:2px;letter-spacing:.5px}
+  .stat .v small{font-size:12px;color:var(--muted);font-weight:400;margin-left:4px}
+  .type-bars{display:grid;gap:9px}
+  .type-row{display:grid;grid-template-columns:110px 1fr 46px;align-items:center;gap:10px;font-size:12.5px}
+  .type-row .name{display:flex;align-items:center;gap:7px;color:#c9d7ee;overflow:hidden}
+  .type-track{height:8px;background:#0b111c;border-radius:999px;overflow:hidden;border:1px solid #1b2740}
+  .type-fill{height:100%;border-radius:999px}
+  .type-row .n{text-align:right;color:var(--muted)}
+  .export-list{display:grid;gap:8px}
+  .export-item{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:#0d1420;font-size:12.5px;
+  }
+  .export-item a{color:#9bb6ff;text-decoration:none}
+  .export-item a:hover{text-decoration:underline}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 2px}
+  .legend span{display:flex;align-items:center;gap:6px;font-size:11.5px;color:#b9c9e4}
+  /* 复核弹层 */
+  .modal{
+    position:fixed;inset:0;z-index:60;background:rgba(4,7,12,.78);backdrop-filter:blur(6px);
+    display:grid;place-items:center;padding:18px;
+  }
+  .modal[hidden]{display:none}
+  .modal-panel{
+    width:min(1480px,97vw);height:94vh;background:var(--panel);border:1px solid var(--line);
+    border-radius:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;
+  }
+  .modal-panel > header{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap;
+  }
+  .rv-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .rv-body{flex:1;display:flex;min-height:0}
+  .rv-stage{
+    flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:10px;padding:14px;background:
+      linear-gradient(45deg,#0a0f18 25%,#0c121c 25%,#0c121c 50%,#0a0f18 50%,#0a0f18 75%,#0c121c 75%);
+    background-size:26px 26px;overflow:auto;
+  }
+  .stage-inner{position:relative;display:inline-block;line-height:0;max-width:100%}
+  .stage-inner img{display:block;max-width:100%;max-height:calc(94vh - 190px);border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+  .boxes{position:absolute;inset:0}
+  .obox{
+    position:absolute;border:2px solid var(--warn);background:rgba(245,165,36,.14);
+    cursor:pointer;transition:box-shadow .12s,background .12s;touch-action:none;
+  }
+  .obox.pending{cursor:move}
+  .obox-handle{
+    position:absolute;width:10px;height:10px;background:#fff;border:1px solid #0b111c;
+    border-radius:2px;z-index:6;box-shadow:0 0 4px rgba(0,0,0,.5);
+  }
+  .obox-handle.nw{left:-6px;top:-6px;cursor:nwse-resize}
+  .obox-handle.n{left:50%;top:-6px;transform:translateX(-50%);cursor:ns-resize}
+  .obox-handle.ne{right:-6px;top:-6px;cursor:nesw-resize}
+  .obox-handle.e{right:-6px;top:50%;transform:translateY(-50%);cursor:ew-resize}
+  .obox-handle.se{right:-6px;bottom:-6px;cursor:nwse-resize}
+  .obox-handle.s{left:50%;bottom:-6px;transform:translateX(-50%);cursor:ns-resize}
+  .obox-handle.sw{left:-6px;bottom:-6px;cursor:nesw-resize}
+  .obox-handle.w{left:-6px;top:50%;transform:translateY(-50%);cursor:ew-resize}
+  #rvBoxes.draw-mode{cursor:crosshair}
+  #rvBoxes.draw-mode .obox{pointer-events:none}
+  .draw-box{
+    position:absolute;border:2px dashed #57d3e8;background:rgba(87,211,232,.16);
+    pointer-events:none;z-index:8;
+  }
+  .obox.accepted{background:rgba(37,194,110,.10)}
+  .obox.rejected{border-style:dashed;border-color:#6b7a94;background:rgba(107,122,148,.08);opacity:.75}
+  .obox.selected{box-shadow:0 0 0 2px #fff,0 0 16px rgba(255,255,255,.35);z-index:3}
+  .obox-label{
+    position:absolute;left:-2px;top:-2px;transform:translateY(-100%);
+    font-size:11px;line-height:1.5;padding:1px 6px;border-radius:5px 5px 5px 0;
+    background:var(--warn);color:#1a1205;white-space:nowrap;font-weight:600;
+  }
+  .obox.accepted .obox-label{color:#04170c}
+  .obox.rejected .obox-label{background:#6b7a94;color:#0a0f18}
+  .rv-tip{font-size:11.5px;color:var(--muted2);text-align:center}
+  .rv-side{
+    width:390px;flex:none;border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0;
+    background:#0e1522;
+  }
+  .rv-summary{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+  .rv-summary b{color:var(--text)}
+  .rv-list{flex:1;overflow:auto;padding:10px 12px;display:grid;gap:8px;align-content:start}
+  .box-item{
+    border:1px solid var(--line);border-radius:10px;padding:9px 10px;background:#0d1426;
+    display:grid;gap:8px;cursor:pointer;transition:.12s;
+  }
+  .box-item:hover{border-color:#33496d}
+  .box-item.selected{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent-soft)}
+  .bi-head{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+  .bi-head .idx{color:var(--text);font-weight:600}
+  .bi-head .who{margin-left:auto;font-size:11px;color:#7f92ae}
+  .bi-head .score{margin-left:6px;color:var(--muted2);font-variant-numeric:tabular-nums}
+  .bi-row{display:flex;align-items:center;gap:6px}
+  .bi-row select{flex:1;min-width:0;padding:5px 6px;border-radius:7px;font-size:12px}
+  .bi-row .btn{padding:5px 9px;font-size:12px;border-radius:7px}
+  .tag{font-size:10.5px;padding:0 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted2)}
+  .tag.pending{color:#ffd27a;border-color:#6b5220;background:rgba(245,165,36,.1)}
+  .tag.accepted{color:#7ee2ab;border-color:#1d5c3f;background:rgba(37,194,110,.1)}
+  .tag.rejected{color:#a8b6cc;border-color:#33445f;background:rgba(120,140,170,.1)}
+  .rv-actions{padding:12px 14px;border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap}
+  .rv-actions .btn{flex:1}
+  .toasts{position:fixed;right:18px;bottom:18px;z-index:99;display:grid;gap:8px;max-width:380px}
+  .toast{
+    background:#132033;border:1px solid #27395a;border-left:3px solid var(--accent);
+    border-radius:10px;padding:9px 13px;font-size:12.5px;box-shadow:var(--shadow);
+    animation:slidein .2s ease-out;
+  }
+  .toast.ok{border-left-color:var(--ok)}
+  .toast.err{border-left-color:var(--danger)}
+  @keyframes slidein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media (max-width:900px){
+    .rv-side{width:100%;border-left:none;border-top:1px solid var(--line);max-height:45%}
+    .rv-body{flex-direction:column}
+    .stage-inner img{max-height:44vh}
+  }
+
+  /* ── 中海物业主题：Ant Design Pro 浅色 ───────────────────────────────── */
+  html.theme-zhonghai{
+    --bg:#f5f5f5; --panel:#ffffff; --panel2:#fafafa; --line:#f0f0f0;
+    --text:rgba(0,0,0,.88); --muted:rgba(0,0,0,.65); --muted2:rgba(0,0,0,.45);
+    --accent:#1677ff; --accent-soft:#e6f4ff;
+    --ok:#52c41a; --warn:#faad14; --danger:#ff4d4f;
+    --radius:8px; --shadow:0 6px 16px rgba(0,0,0,.08);
+    color-scheme:light;
+  }
+  html.theme-zhonghai body{
+    background:#f5f5f5;color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","Microsoft YaHei","PingFang SC",sans-serif;
+    font-size:14px;
+  }
+  html.theme-zhonghai header.topbar{background:#fff;border-bottom:1px solid var(--line);padding:14px 24px}
+  html.theme-zhonghai .logo{background:#1677ff;color:#fff;border-radius:8px;font-size:16px}
+  html.theme-zhonghai .brand h1{font-size:17px;letter-spacing:0}
+  html.theme-zhonghai .brand p{color:rgba(0,0,0,.45)}
+  html.theme-zhonghai nav.tabs{background:#fff;border-bottom:1px solid var(--line);padding:0 24px}
+  html.theme-zhonghai nav.tabs button{color:rgba(0,0,0,.65);border-radius:0;padding:12px 16px}
+  html.theme-zhonghai nav.tabs button:hover{background:#f5f5f5;color:var(--text)}
+  html.theme-zhonghai nav.tabs button.active{color:#1677ff;border-bottom-color:#1677ff;font-weight:600}
+  html.theme-zhonghai main{padding:20px 24px 60px}
+  html.theme-zhonghai .card{background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+  html.theme-zhonghai .card h2{font-size:15px;color:var(--text)}
+  html.theme-zhonghai .card h2 .sub{color:var(--muted2)}
+  html.theme-zhonghai input[type=text],
+  html.theme-zhonghai input[type=number],
+  html.theme-zhonghai select{background:#fff;border:1px solid #d9d9d9;color:var(--text);border-radius:6px}
+  html.theme-zhonghai input[type=text]:focus,
+  html.theme-zhonghai input[type=number]:focus,
+  html.theme-zhonghai select:focus{border-color:#1677ff;box-shadow:0 0 0 2px rgba(22,119,255,.1)}
+  html.theme-zhonghai input[type=color]{background:#fff;border:1px solid #d9d9d9;border-radius:6px}
+  html.theme-zhonghai .btn{background:#fff;border:1px solid #d9d9d9;color:var(--text);border-radius:6px}
+  html.theme-zhonghai .btn:hover{border-color:#1677ff;color:#1677ff;background:#fff}
+  html.theme-zhonghai .btn.primary{background:#1677ff;border-color:#1677ff;color:#fff}
+  html.theme-zhonghai .btn.primary:hover{background:#4096ff;border-color:#4096ff;color:#fff}
+  html.theme-zhonghai .btn.danger{color:#ff4d4f;border-color:#ffccc7;background:#fff}
+  html.theme-zhonghai .btn.danger:hover{background:#fff1f0;border-color:#ff4d4f}
+  html.theme-zhonghai .badge{background:#fafafa;border:1px solid var(--line);color:rgba(0,0,0,.65)}
+  html.theme-zhonghai .badge strong{color:var(--text)}
+  html.theme-zhonghai .badge.ok{background:#f6ffed;border-color:#b7eb8f;color:#389e0d}
+  html.theme-zhonghai .badge.warn{background:#fffbe6;border-color:#ffe58f;color:#d48806}
+  html.theme-zhonghai .badge select{background:#fff;border-color:#d9d9d9;color:var(--text)}
+  html.theme-zhonghai .model-item{background:#fafafa;border-color:var(--line);border-radius:8px}
+  html.theme-zhonghai .mi-classes span{background:#f5f5f5;border-color:var(--line);color:rgba(0,0,0,.65)}
+  html.theme-zhonghai .pill{color:rgba(0,0,0,.65);border-color:var(--line)}
+  html.theme-zhonghai .pill.ok{color:#389e0d;border-color:#b7eb8f;background:#f6ffed}
+  html.theme-zhonghai .pill.warn{color:#d48806;border-color:#ffe58f;background:#fffbe6}
+  html.theme-zhonghai .pill.err{color:#cf1322;border-color:#ffccc7;background:#fff1f0}
+  html.theme-zhonghai th{background:#fafafa;color:var(--text);font-weight:600;border-bottom:1px solid var(--line)}
+  html.theme-zhonghai td{border-bottom:1px solid var(--line)}
+  html.theme-zhonghai tbody tr:hover{background:#fafafa}
+  html.theme-zhonghai .empty{border-color:#d9d9d9;color:var(--muted2)}
+  html.theme-zhonghai .bar{background:#f0f0f0;border:none}
+  html.theme-zhonghai .bar > div{background:#1677ff}
+  html.theme-zhonghai .dropzone{background:#fafafa;border-color:#d9d9d9;color:var(--muted2)}
+  html.theme-zhonghai .dropzone:hover,
+  html.theme-zhonghai .dropzone.drag{border-color:#1677ff;background:#e6f4ff;color:var(--text)}
+  html.theme-zhonghai .img-card{background:#fff;border-color:var(--line);border-radius:8px}
+  html.theme-zhonghai .img-card:hover{border-color:#1677ff;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  html.theme-zhonghai .thumb{background:#f5f5f5}
+  html.theme-zhonghai .st{background:#f5f5f5;border-color:var(--line);color:rgba(0,0,0,.65)}
+  html.theme-zhonghai .st.done{color:#389e0d;border-color:#b7eb8f;background:#f6ffed}
+  html.theme-zhonghai .st.pending{color:#d48806;border-color:#ffe58f;background:#fffbe6}
+  html.theme-zhonghai .st.err{color:#cf1322;border-color:#ffccc7;background:#fff1f0}
+  html.theme-zhonghai .st.ai{color:#0958d9;border-color:#91caff;background:#e6f4ff}
+  html.theme-zhonghai .stat{background:#fafafa;border-color:var(--line);border-radius:8px}
+  html.theme-zhonghai .stat .k{color:var(--muted2)}
+  html.theme-zhonghai .type-row .name{color:rgba(0,0,0,.75)}
+  html.theme-zhonghai .type-track{background:#f0f0f0;border:none}
+  html.theme-zhonghai .export-item{background:#fafafa;border-color:var(--line);border-radius:8px}
+  html.theme-zhonghai .export-item a{color:#1677ff}
+  html.theme-zhonghai .legend span{color:rgba(0,0,0,.65)}
+  html.theme-zhonghai .modal{background:rgba(0,0,0,.45)}
+  html.theme-zhonghai .modal-panel{background:#fff;border-color:var(--line);border-radius:8px}
+  html.theme-zhonghai .rv-stage{background:#fafafa;background-image:none}
+  html.theme-zhonghai .stage-inner img{box-shadow:0 6px 20px rgba(0,0,0,.12)}
+  html.theme-zhonghai .obox-handle{background:#fff;border-color:#1677ff;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  html.theme-zhonghai .obox.selected{box-shadow:0 0 0 2px #fff,0 0 0 4px #1677ff}
+  html.theme-zhonghai .obox.rejected{border-color:#bfbfbf;background:rgba(0,0,0,.04)}
+  html.theme-zhonghai .obox.rejected .obox-label{background:#8c8c8c;color:#fff}
+  html.theme-zhonghai .rv-side{background:#fafafa}
+  html.theme-zhonghai .rv-summary{color:var(--muted)}
+  html.theme-zhonghai .box-item{background:#fff;border-color:var(--line);border-radius:8px}
+  html.theme-zhonghai .box-item:hover{border-color:#91caff}
+  html.theme-zhonghai .bi-head{color:var(--muted)}
+  html.theme-zhonghai .bi-head .who{color:var(--muted2)}
+  html.theme-zhonghai .tag{color:var(--muted2);border-color:var(--line)}
+  html.theme-zhonghai .tag.pending{color:#d48806;border-color:#ffe58f;background:#fffbe6}
+  html.theme-zhonghai .tag.accepted{color:#389e0d;border-color:#b7eb8f;background:#f6ffed}
+  html.theme-zhonghai .tag.rejected{color:rgba(0,0,0,.45);border-color:#d9d9d9;background:#fafafa}
+  html.theme-zhonghai .rv-tip{color:var(--muted2)}
+  html.theme-zhonghai .toast{background:#fff;border-color:var(--line);border-left-color:#1677ff;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+  html.theme-zhonghai .toast.ok{border-left-color:#52c41a}
+  html.theme-zhonghai .toast.err{border-left-color:#ff4d4f}
+
+  /* 嵌入 Streamlit 时收紧外框，避免与宿主页面重复 */
+  html.embed header.topbar{padding:8px 16px;justify-content:flex-end}
+  html.embed header.topbar .brand{display:none}
+  html.embed nav.tabs{padding:0 12px;position:sticky;top:0;z-index:30}
+  html.embed main{padding:12px 8px 36px;max-width:none;width:100%}
+  html.embed .card{padding:16px}
+  html.embed .toasts{right:12px;bottom:12px}
+</style>
+<script>
+  (function () {
+    var params = new URLSearchParams(location.search);
+    var root = document.documentElement;
+    if (params.get('theme') === 'zhonghai') root.classList.add('theme-zhonghai');
+    if (params.get('embed') === '1') root.classList.add('embed');
+  })();
+</script>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">◧</div>
+    <div>
+      <h1>缺陷标注台</h1>
+      <p>AI 预标注 · 人工逐框确认 · 导出本地</p>
+    </div>
+  </div>
+  <div class="top-right">
+    <span class="badge" id="deviceBadge">设备检测中…</span>
+    <span class="badge muted" id="batchBadge">未选择批次</span>
+    <span class="badge" id="annotatorBadge" style="cursor:pointer" title="点击管理标注员">标注员：未选择</span>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button data-view="batch" class="active">批次与模型</button>
+  <button data-view="types">缺陷类型</button>
+  <button data-view="annotators">标注员</button>
+  <button data-view="work">标注工作台</button>
+  <button data-view="stats">统计与导出</button>
+</nav>
+
+<main>
+  <!-- 批次与模型 -->
+  <section id="view-batch">
+    <div class="grid-2">
+      <div class="card">
+        <h2>创建批次 <span class="sub">一次导入一批图片，选定一个模型</span></h2>
+        <div class="form-grid">
+          <label class="field"><span>批次名称</span>
+            <input type="text" id="batchName" placeholder="例如：外墙缺陷-20261126">
+          </label>
+          <label class="field"><span>AI 标注模型</span>
+            <select id="modelSelect"></select>
+          </label>
+          <label class="field"><span>AI 输出方式</span>
+            <select id="batchMode">
+              <option value="BOX_ONLY">只框潜在缺陷（类型由人工判定）</option>
+              <option value="SUGGEST">框选并给出类型建议</option>
+            </select>
+          </label>
+          <label class="field"><span>AI 提示词（仅开放词汇模型生效，英文逗号分隔）</span>
+            <input type="text" id="batchPrompt" placeholder="crack, spalling, exposed rebar, corrosion, hole, defect">
+          </label>
+          <div class="field-row">
+            <label class="field"><span>置信度阈值 <b class="field-val" id="confVal">0.25</b></span>
+              <input type="range" id="confRange" min="0.05" max="0.95" step="0.05" value="0.25">
+            </label>
+            <label class="field"><span>IoU 阈值 <b class="field-val" id="iouVal">0.45</b></span>
+              <input type="range" id="iouRange" min="0.10" max="0.90" step="0.05" value="0.45">
+            </label>
+          </div>
+          <p class="hint" id="modelHint">模型只负责框出潜在缺陷区域，缺陷类型由人工逐框判定；也可选择「同时给出类型建议」。</p>
+          <div><button class="btn primary" id="createBatchBtn">创建批次</button></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>模型库 <span class="sub">扫描本机已有权重，也可上传 .pt</span>
+          <button class="btn ghost small" id="uploadModelBtn">上传 .pt 权重</button>
+        </h2>
+        <div class="model-list" id="modelList"></div>
+        <input type="file" id="modelFile" accept=".pt" hidden>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>批次列表 <span class="sub" id="batchCount"></span>
+        <button class="btn ghost small" id="refreshBatches">刷新</button>
+      </h2>
+      <div class="table-wrap" id="batchTable"></div>
+    </div>
+  </section>
+
+  <!-- 缺陷类型 -->
+  <section id="view-types" hidden>
+    <div class="card">
+      <h2>新增缺陷类型 <span class="sub">编码用于和模型类别自动对应，建议使用英文</span></h2>
+      <div class="actions">
+        <input type="text" id="typeCode" placeholder="编码，如 crack">
+        <input type="text" id="typeName" placeholder="名称，如 裂缝">
+        <input type="color" id="typeColor" value="#ff5c5c">
+        <button class="btn primary" id="addTypeBtn">新增</button>
+      </div>
+      <p class="hint" style="margin-top:8px">停用后不会出现在人工确认的下拉选项中，历史标注仍保留该类型。</p>
+    </div>
+    <div class="card">
+      <h2>缺陷类型配置 <span class="sub" id="typeCount"></span></h2>
+      <div class="table-wrap" id="typeTable"></div>
+    </div>
+  </section>
+
+  <!-- 标注员 -->
+  <section id="view-annotators" hidden>
+    <div class="card">
+      <h2>新增标注员 <span class="sub">姓名必填，工号 / 备注可选</span></h2>
+      <div class="actions">
+        <input type="text" id="annotatorName" placeholder="姓名，如 张三">
+        <input type="text" id="annotatorCode" placeholder="工号（可选）">
+        <input type="text" id="annotatorNote" placeholder="备注（可选）" style="flex:1;min-width:180px">
+        <button class="btn primary" id="addAnnotatorBtn">新增</button>
+      </div>
+      <p class="hint" style="margin-top:8px">确认 / 拒绝框与完成图片时会自动记录当前标注员和操作时间，并写入导出包。</p>
+    </div>
+    <div class="card">
+      <h2>标注员列表 <span class="sub" id="annotatorCount"></span></h2>
+      <div class="table-wrap" id="annotatorTable"></div>
+    </div>
+  </section>
+
+  <!-- 标注工作台 -->
+  <section id="view-work" hidden>
+    <div id="workEmpty" class="empty">还没有选择批次，请先在「批次与模型」中创建或进入一个批次。</div>
+    <div id="workBody" hidden>
+      <div class="card">
+        <div class="work-head">
+          <div class="work-title">
+            <h2 id="workName">—</h2>
+            <span class="pill" id="workStatus">—</span>
+          </div>
+          <div class="actions">
+            <button class="btn ghost" id="goBatchBtn">切换批次</button>
+            <button class="btn" id="continueBtn">继续确认</button>
+            <button class="btn primary" id="detectBtn">开始 AI 标注</button>
+          </div>
+        </div>
+        <div class="work-meta" id="workMeta"></div>
+        <div class="progress-wrap" id="progressWrap" hidden>
+          <div class="progress-head"><span id="progressLabel">准备中…</span><span id="progressPct">0%</span></div>
+          <div class="bar"><div id="progressBar"></div></div>
+          <p class="hint" id="progressCurrent" style="margin-top:6px"></p>
+        </div>
+        <div class="dropzone" id="dropzone">
+          拖拽图片到此处，或 <b>点击选择图片</b>（支持 jpg / png / bmp / webp / tif，可多选）
+        </div>
+        <input type="file" id="imageFiles" accept="image/*" multiple hidden>
+      </div>
+
+      <div class="card">
+        <h2>图片列表 <span class="sub" id="imageSummary"></span>
+          <button class="btn ghost small" id="refreshImages">刷新</button>
+        </h2>
+        <div class="image-grid" id="imageGrid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 统计与导出 -->
+  <section id="view-stats" hidden>
+    <div id="statsEmpty" class="empty">选择批次后可查看本批次标注统计。</div>
+    <div id="statsBody" hidden>
+      <div class="card">
+        <h2>本批次统计 <span class="sub" id="statsSub"></span>
+          <button class="btn ghost small" id="refreshStats">刷新</button>
+        </h2>
+        <div class="stat-grid" id="statCards"></div>
+      </div>
+      <div class="grid-2" style="margin-top:18px">
+        <div class="card" style="margin-top:0">
+          <h2>已接受缺陷分布</h2>
+          <div class="type-bars" id="typeBars"></div>
+        </div>
+        <div class="card" style="margin-top:0">
+          <h2>导出标注结果 <span class="sub">画框图 + YOLO 标签 + JSON</span></h2>
+          <p class="hint" style="margin-bottom:12px">
+            导出内容：annotated/（带框图片）、labels/（YOLO txt）、annotations.json（含逐框标注员）、
+            annotators.csv（标注员工作量）、classes.txt、stats.csv、stats.json。
+            仅导出人工接受了缺陷类型的框；标记为「不是缺陷」的框不会进入标签。
+          </p>
+          <button class="btn primary" id="exportBtn">导出本批次 ZIP</button>
+          <h3 style="font-size:13px;color:var(--muted);margin:18px 0 8px">历史导出</h3>
+          <div class="export-list" id="exportList"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:18px">
+        <h2>标注员工作量 <span class="sub" id="annotatorStatsSub"></span></h2>
+        <div class="table-wrap" id="annotatorStats"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="toasts" id="toasts"></div>
+
+<!-- 人工复核弹层 -->
+<div class="modal" id="reviewModal" hidden>
+  <div class="modal-panel">
+    <header>
+      <div>
+        <strong id="rvName">—</strong>
+        <span class="muted" id="rvMeta" style="margin-left:10px"></span>
+      </div>
+      <div class="rv-nav">
+        <label class="badge" id="rvAnnotatorWrap">标注员
+          <select id="rvAnnotator"></select>
+        </label>
+        <button class="btn small" id="rvPrev">上一张</button>
+        <span class="badge" id="rvIndex">—</span>
+        <button class="btn small" id="rvNext">下一张</button>
+        <button class="btn small ghost" id="rvClose">关闭</button>
+      </div>
+    </header>
+    <div class="rv-body">
+      <div class="rv-stage">
+        <div class="stage-inner">
+          <img id="rvImg" alt="待标注图片">
+          <div class="boxes" id="rvBoxes"></div>
+        </div>
+        <div class="rv-tip">新增框：点「＋ 新增框」后在图上拖拽 · 拖动框内移动、拖拽四角/边调整范围，松开自动保存 · 1-9 快速选类型并接受 · A 接受建议类型 · R 不是缺陷 · ↑↓ 切换框 · Esc 关闭</div>
+      </div>
+      <aside class="rv-side">
+        <div class="rv-summary" id="rvSummary"></div>
+        <div class="legend" id="rvLegend" style="padding:0 16px 8px"></div>
+        <div class="rv-list" id="rvList"></div>
+        <div class="rv-actions">
+          <button class="btn" id="rvAddBox">＋ 新增框</button>
+          <button class="btn" id="rvAcceptAll">全部接受建议类型</button>
+          <button class="btn primary" id="rvDone">确认本图完成</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+const STATUS_TEXT = {
+  CREATED: '待上传', UPLOADED: '待标注', DETECTING: 'AI 标注中', DETECTED: '待确认',
+  REVIEWING: '确认中', COMPLETED: '已完成', INTERRUPTED: '已中断', FAILED: '标注失败'
+};
+const IMG_STATUS = {
+  UPLOADED: '待标注', DETECTED: '待确认', REVIEWING: '确认中', DONE: '已完成', ERROR: '异常'
+};
+
+const state = {
+  view: 'batch',
+  models: [],
+  types: [],
+  annotators: [],
+  annotatorId: null,
+  batches: [],
+  batch: null,
+  detail: null,
+  stats: null,
+  pollTimer: null,
+  probeTimer: null,
+  selectedBoxId: null,
+  review: { index: 0, detail: null }
+};
+
+function esc(text) {
+  return String(text == null ? '' : text).replace(/[&<>"']/g, ch => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]
+  ));
+}
+
+function toast(message, kind = '') {
+  const box = document.createElement('div');
+  box.className = 'toast ' + kind;
+  box.textContent = message;
+  $('#toasts').appendChild(box);
+  setTimeout(() => { box.style.opacity = '0'; box.style.transition = 'opacity .25s'; }, 3600);
+  setTimeout(() => box.remove(), 3900);
+}
+
+async function api(path, options = {}) {
+  const opts = { ...options, headers: { ...(options.headers || {}) } };
+  if (opts.body && !(opts.body instanceof FormData)) {
+    opts.headers['Content-Type'] = 'application/json';
+  }
+  const res = await fetch('/api' + path, opts);
+  if (!res.ok) {
+    let msg = res.status + ' ' + res.statusText;
+    try {
+      const data = await res.json();
+      if (data.detail) msg = typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail);
+    } catch (err) { /* ignore */ }
+    throw new Error(msg);
+  }
+  const ct = res.headers.get('content-type') || '';
+  return ct.includes('json') ? res.json() : res;
+}
+
+function activeTypes() {
+  return state.types.filter(item => item.active);
+}
+
+function typeById(id) {
+  return state.types.find(item => item.id === id) || null;
+}
+
+function statusPill(status) {
+  const text = STATUS_TEXT[status] || status;
+  let cls = 'pill';
+  if (['COMPLETED'].includes(status)) cls += ' ok';
+  else if (['DETECTING'].includes(status)) cls += ' warn';
+  else if (['FAILED', 'INTERRUPTED'].includes(status)) cls += ' err';
+  return `<span class="${cls}">${esc(text)}</span>`;
+}
+
+function imageStatusChip(status) {
+  let cls = 'st';
+  if (status === 'DONE') cls += ' done';
+  else if (status === 'DETECTED' || status === 'REVIEWING') cls += ' pending';
+  else if (status === 'ERROR') cls += ' err';
+  return `<span class="${cls}">${esc(IMG_STATUS[status] || status)}</span>`;
+}
+
+/* -------------------------------------------------- 导航 */
+function setView(view) {
+  state.view = view;
+  $$('nav.tabs button').forEach(btn => btn.classList.toggle('active', btn.dataset.view === view));
+  $$('main > section').forEach(section => { section.hidden = section.id !== 'view-' + view; });
+  if (view === 'work') renderWork();
+  if (view === 'stats') loadStats();
+  if (view === 'types') renderTypes();
+  if (view === 'annotators') loadAnnotators();
+}
+
+function bindNav() {
+  $$('nav.tabs button').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.view)));
+}
+
+/* -------------------------------------------------- 健康 / 模型 */
+async function loadHealth() {
+  try {
+    const data = await api('/health');
+    const gpu = data.gpu ? data.gpu : 'CPU';
+    $('#deviceBadge').className = 'badge ok';
+    $('#deviceBadge').innerHTML = `推理设备：<strong>${esc(data.device)}</strong> · ${esc(gpu)}`;
+  } catch (err) {
+    $('#deviceBadge').className = 'badge';
+    $('#deviceBadge').textContent = '服务不可用';
+  }
+}
+
+async function loadModels() {
+  state.models = await api('/models');
+  renderModels();
+  if (state.models.some(item => item.task === 'PROBING')) {
+    clearTimeout(state.probeTimer);
+    state.probeTimer = setTimeout(loadModels, 2200);
+  }
+}
+
+function renderModels() {
+  const box = $('#modelList');
+  if (!state.models.length) {
+    box.innerHTML = '<div class="empty">未发现可用权重</div>';
+  } else {
+    box.innerHTML = state.models.map(model => {
+      const pillCls = model.task === 'PROBING' ? 'warn' : (model.task === 'ERROR' ? 'err' : 'ok');
+      const taskText = model.task === 'PROBING' ? '探测中'
+        : (model.task === 'ERROR' ? '不可用'
+        : (model.task === 'detect' ? '检测' : (model.task === 'segment' ? '分割' : model.task)));
+      const classes = (model.classes || []).slice(0, 10).map(item => `<span>${esc(item.name)}</span>`).join('');
+      const more = (model.classes || []).length > 10 ? `<span>+${model.classes.length - 10}</span>` : '';
+      return `<div class="model-item">
+        <div class="mi-top"><strong>${esc(model.name)}</strong><span class="pill ${pillCls}">${esc(taskText)}</span></div>
+        <div class="mi-meta">${(model.classes || []).length} 类 · ${(model.size / 1048576).toFixed(1)} MB · ${model.source === 'upload' ? '已上传' : '本机扫描'}</div>
+        <div class="mi-classes">${classes}${more}</div>
+        ${model.error ? `<div class="hint" style="color:#ff9aa6;margin-top:6px">${esc(model.error)}</div>` : ''}
+      </div>`;
+    }).join('');
+  }
+  const select = $('#modelSelect');
+  const prev = select.value;
+  const ready = state.models.filter(item => item.ready);
+  select.innerHTML = ready.length
+    ? ready.map(model => `<option value="${model.id}">${esc(model.name)} · ${esc(model.task)}</option>`).join('')
+    : '<option value="">暂无就绪模型</option>';
+  if (prev && ready.some(item => String(item.id) === prev)) select.value = prev;
+  updateModelHint();
+}
+
+function updateModelHint() {
+  const id = Number($('#modelSelect').value);
+  const model = state.models.find(item => item.id === id);
+  if (!model) {
+    $('#modelHint').textContent = '请先准备一个可用模型（等待探测完成或上传 .pt）。';
+    return;
+  }
+  const names = (model.classes || []).slice(0, 8).map(item => item.name).join('、');
+  const modelKey = ((model.name || '') + ' ' + (model.path || '')).toLowerCase();
+  const isOpenVocab = (/world|yoloe|grounding|owlv2/.test(modelKey));
+  const isOwl = /owlv2/.test(modelKey);
+  if (isOpenVocab && !$('#batchPrompt').value.trim()) {
+    $('#batchPrompt').value = 'defect, damage, crack, spalling, corrosion';
+  }
+  if (isOpenVocab && Number($('#confRange').value) > (isOwl ? 0.08 : 0.15)) {
+    $('#confRange').value = isOwl ? '0.05' : '0.12';
+    $('#confRange').dispatchEvent(new Event('input'));
+  }
+  $('#modelHint').textContent = isOpenVocab
+    ? (isOwl
+      ? 'OWLv2：需填写英文提示词，只按提示词框出候选区域；该模型分数偏低，置信度建议 0.04–0.08，过高会几乎没有框。'
+      : '开放词汇模型：需填写英文提示词（如 defect, damage, crack），只按提示词框出候选区域；Grounding DINO / YOLOE 偏召回，置信度建议 0.10–0.20 起调。')
+    : `当前模型类别：${names || '未知'}${(model.classes || []).length > 8 ? ' 等' : ''}。默认只取框、不预填类型，类型由人工判定。`;
+}
+
+function bindBatchView() {
+  const defaultName = '批次-' + new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  $('#batchName').value = defaultName;
+  $('#confRange').addEventListener('input', () => { $('#confVal').textContent = Number($('#confRange').value).toFixed(2); });
+  $('#iouRange').addEventListener('input', () => { $('#iouVal').textContent = Number($('#iouRange').value).toFixed(2); });
+  $('#modelSelect').addEventListener('change', updateModelHint);
+  $('#refreshBatches').addEventListener('click', loadBatches);
+  $('#createBatchBtn').addEventListener('click', async () => {
+    const modelId = Number($('#modelSelect').value);
+    if (!modelId) return toast('没有可用模型', 'err');
+    const name = $('#batchName').value.trim() || ('批次-' + Date.now());
+    try {
+      const batch = await api('/batches', {
+        method: 'POST',
+        body: JSON.stringify({
+          name,
+          model_id: modelId,
+          conf: Number($('#confRange').value),
+          iou: Number($('#iouRange').value),
+          mode: $('#batchMode').value,
+          prompt: $('#batchPrompt').value.trim()
+        })
+      });
+      toast('批次已创建：' + batch.name, 'ok');
+      await loadBatches();
+      await selectBatch(batch.id);
+      setView('work');
+    } catch (err) { toast(err.message, 'err'); }
+  });
+  $('#uploadModelBtn').addEventListener('click', () => $('#modelFile').click());
+  $('#modelFile').addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    event.target.value = '';
+    if (!file) return;
+    const fd = new FormData();
+    fd.append('file', file);
+    toast('正在上传并识别权重…');
+    try {
+      const model = await api('/models/upload', { method: 'POST', body: fd });
+      toast('模型已导入：' + model.name, 'ok');
+      await loadModels();
+    } catch (err) { toast(err.message, 'err'); }
+  });
+}
+
+async function loadBatches() {
+  try {
+    state.batches = await api('/batches');
+  } catch (err) {
+    state.batches = [];
+    toast(err.message, 'err');
+  }
+  renderBatches();
+}
+
+function renderBatches() {
+  const box = $('#batchTable');
+  $('#batchCount').textContent = state.batches.length ? `共 ${state.batches.length} 个批次` : '';
+  if (!state.batches.length) {
+    box.innerHTML = '<div class="empty">还没有批次，先创建一个。</div>';
+    return;
+  }
+  const rows = state.batches.map(batch => {
+    const active = state.batch && state.batch.id === batch.id;
+    return `<tr>
+      <td>#${batch.id}</td>
+      <td><strong>${esc(batch.name)}</strong>${active ? ' <span class="pill ok">当前</span>' : ''}</td>
+      <td class="muted">${esc(batch.model_name || '')}</td>
+      <td>${statusPill(batch.status)}</td>
+      <td>${batch.image_count}</td>
+      <td>${batch.pending_boxes} 待确认 / ${batch.box_count} 框</td>
+      <td class="muted">${esc(batch.created_at)}</td>
+      <td>
+        <button class="btn small" data-enter="${batch.id}">进入</button>
+        <button class="btn small danger" data-del="${batch.id}">删除</button>
+      </td>
+    </tr>`;
+  }).join('');
+  box.innerHTML = `<table>
+    <thead><tr><th>ID</th><th>名称</th><th>模型</th><th>状态</th><th>图片</th><th>标注进度</th><th>创建时间</th><th>操作</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+  $$('[data-enter]', box).forEach(btn => btn.addEventListener('click', async () => {
+    await selectBatch(Number(btn.dataset.enter));
+    setView('work');
+  }));
+  $$('[data-del]', box).forEach(btn => btn.addEventListener('click', async () => {
+    const id = Number(btn.dataset.del);
+    if (!confirm(`确认删除批次 #${id}？图片与标注记录会一并删除。`)) return;
+    try {
+      await api(`/batches/${id}`, { method: 'DELETE' });
+      if (state.batch && state.batch.id === id) {
+        state.batch = null; state.detail = null; state.stats = null;
+        localStorage.removeItem('labeler.batchId');
+        renderWork(); renderBatchBadge();
+      }
+      toast('批次已删除', 'ok');
+      await loadBatches();
+    } catch (err) { toast(err.message, 'err'); }
+  }));
+}
+
+async function selectBatch(id, silent = false) {
+  try {
+    const detail = await api(`/batches/${id}`);
+    state.batch = detail.batch;
+    state.detail = detail;
+    state.stats = null;
+    state.selectedBoxId = null;
+    localStorage.setItem('labeler.batchId', String(id));
+    renderBatchBadge();
+    renderWork();
+    if (!silent) toast('已进入批次：' + detail.batch.name, 'ok');
+    if (detail.batch.status === 'DETECTING') startPolling();
+  } catch (err) {
+    if (!silent) toast(err.message, 'err');
+    localStorage.removeItem('labeler.batchId');
+  }
+}
+
+function renderBatchBadge() {
+  const badge = $('#batchBadge');
+  if (state.batch) {
+    badge.className = 'badge';
+    badge.innerHTML = `当前批次：<strong>${esc(state.batch.name)}</strong>`;
+  } else {
+    badge.className = 'badge muted';
+    badge.textContent = '未选择批次';
+  }
+}
+
+/* -------------------------------------------------- 缺陷类型 */
+async function loadTypes() {
+  try {
+    state.types = await api('/defect-types');
+  } catch (err) {
+    toast(err.message, 'err');
+  }
+  renderTypes();
+  renderLegend();
+}
+
+function bindTypesView() {
+  $('#addTypeBtn').addEventListener('click', async () => {
+    const code = $('#typeCode').value.trim();
+    const name = $('#typeName').value.trim();
+    const color = $('#typeColor').value;
+    if (!code || !name) return toast('编码和名称都要填写', 'err');
+    try {
+      await api('/defect-types', { method: 'POST', body: JSON.stringify({ code, name, color }) });
+      $('#typeCode').value = ''; $('#typeName').value = '';
+      toast('已新增缺陷类型：' + name, 'ok');
+      await loadTypes();
+    } catch (err) { toast(err.message, 'err'); }
+  });
+}
+
+function renderTypes() {
+  const box = $('#typeTable');
+  $('#typeCount').textContent = `共 ${state.types.length} 个类型，${state.types.filter(item => item.active).length} 个启用`;
+  if (!state.types.length) {
+    box.innerHTML = '<div class="empty">暂无缺陷类型</div>';
+    return;
+  }
+  const rows = state.types.map(item => `<tr data-type-row="${item.id}">
+    <td><input type="color" value="${esc(item.color)}" data-f="color"></td>
+    <td><input type="text" value="${esc(item.code)}" data-f="code" style="width:140px"></td>
+    <td><input type="text" value="${esc(item.name)}" data-f="name" style="width:150px"></td>
+    <td><label class="hint" style="display:flex;align-items:center;gap:6px;cursor:pointer">
+      <input type="checkbox" data-f="active" ${item.active ? 'checked' : ''}> 启用</label></td>
+    <td><button class="btn small" data-save="${item.id}">保存</button></td>
+  </tr>`).join('');
+  box.innerHTML = `<table>
+    <thead><tr><th>颜色</th><th>编码</th><th>名称</th><th>状态</th><th>操作</th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+  $$('[data-save]', box).forEach(btn => btn.addEventListener('click', async () => {
+    const id = Number(btn.dataset.save);
+    const row = $(`[data-type-row="${id}"]`, box);
+    const payload = {
+      code: $('[data-f="code"]', row).value.trim(),
+      name: $('[data-f="name"]', row).value.trim(),
+      color: $('[data-f="color"]', row).value,
+      active: $('[data-f="active"]', row).checked
+    };
+    try {
+      await api(`/defect-types/${id}`, { method: 'PATCH', body: JSON.stringify(payload) });
+      toast('已保存', 'ok');
+      await loadTypes();
+    } catch (err) { toast(err.message, 'err'); }
+  }));
+}
+
+/* -------------------------------------------------- 标注员 */
+async function loadAnnotators() {
+  try {
+    state.annotators = await api('/annotators');
+  } catch (err) {
+    state.annotators = [];
+    toast(err.message, 'err');
+  }
+  const saved = Number(localStorage.getItem('labeler.annotatorId'));
+  if (saved && state.annotators.some(item => item.id === saved && item.active)) {
+    state.annotatorId = saved;
+  } else if (!state.annotators.some(item => item.id === state.annotatorId && item.active)) {
+    state.annotatorId = null;
+    localStorage.removeItem('labeler.annotatorId');
+  }
+  renderAnnotatorBadge();
+  renderAnnotatorTable();
+}
+
+function currentAnnotator() {
+  return state.annotators.find(item => item.id === state.annotatorId && item.active) || null;
+}
+
+function setAnnotator(id) {
+  const target = state.annotators.find(item => item.id === id && item.active);
+  state.annotatorId = target ? target.id : null;
+  if (target) localStorage.setItem('labeler.annotatorId', String(target.id));
+  else localStorage.removeItem('labeler.annotatorId');
+  renderAnnotatorBadge();
+  renderAnnotatorTable();
+}
+
+function ensureAnnotator() {
+  const current = currentAnnotator();
+  if (current) return current.id;
+  toast('请先选择当前标注员（弹层顶部或「标注员」页）', 'err');
+  return null;
+}
+
+function renderAnnotatorBadge() {
+  const badge = $('#annotatorBadge');
+  const current = currentAnnotator();
+  if (current) {
+    badge.className = 'badge ok';
+    badge.innerHTML = `标注员：<strong>${esc(current.name)}</strong>${current.code ? ' · ' + esc(current.code) : ''}`;
+  } else {
+    badge.className = 'badge warn';
+    badge.textContent = '标注员：未选择';
+  }
+  const select = $('#rvAnnotator');
+  if (select) {
+    select.innerHTML = '<option value="">未选择标注员</option>' + state.annotators
+      .filter(item => item.active)
+      .map(item => `<option value="${item.id}">${esc(item.name)}${item.code ? ' / ' + esc(item.code) : ''}</option>`)
+      .join('');
+    select.value = state.annotatorId || '';
+  }
+}
+
+function renderAnnotatorTable() {
+  const box = $('#annotatorTable');
+  $('#annotatorCount').textContent = state.annotators.length
+    ? `共 ${state.annotators.length} 人，${state.annotators.filter(item => item.active).length} 人启用` : '';
+  if (!state.annotators.length) {
+    box.innerHTML = '<div class="empty">还没有标注员，先新增一位再开始人工确认。</div>';
+    return;
+  }
+  const rows = state.annotators.map(item => {
+    const isCurrent = state.annotatorId === item.id && item.active;
+    return `<tr data-annotator="${item.id}">
+      <td><input type="text" value="${esc(item.name)}" data-f="name" style="width:120px"></td>
+      <td><input type="text" value="${esc(item.code || '')}" data-f="code" style="width:110px" placeholder="—"></td>
+      <td><input type="text" value="${esc(item.note || '')}" data-f="note" style="width:180px" placeholder="—"></td>
+      <td>${item.accepted}</td>
+      <td>${item.rejected}</td>
+      <td>${item.done_images}</td>
+      <td><label class="hint" style="display:flex;align-items:center;gap:6px;cursor:pointer">
+        <input type="checkbox" data-f="active" ${item.active ? 'checked' : ''}> 启用</label></td>
+      <td>
+        <button class="btn small" data-save="${item.id}">保存</button>
+        <button class="btn small ${isCurrent ? 'primary' : 'ghost'}" data-use="${item.id}" ${item.active ? '' : 'disabled'}>
+          ${isCurrent ? '当前标注员' : '设为当前'}</button>
+      </td>
+    </tr>`;
+  }).join('');
+  box.innerHTML = `<table>
+    <thead><tr><th>姓名</th><th>工号</th><th>备注</th><th>接受框</th><th>拒绝框</th><th>完成图片</th><th>状态</th><th>操作</th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+}
+
+function bindAnnotatorsView() {
+  $('#addAnnotatorBtn').addEventListener('click', async () => {
+    const name = $('#annotatorName').value.trim();
+    if (!name) return toast('请填写标注员姓名', 'err');
+    try {
+      const created = await api('/annotators', {
+        method: 'POST',
+        body: JSON.stringify({
+          name,
+          code: $('#annotatorCode').value.trim(),
+          note: $('#annotatorNote').value.trim()
+        })
+      });
+      $('#annotatorName').value = ''; $('#annotatorCode').value = ''; $('#annotatorNote').value = '';
+      await loadAnnotators();
+      setAnnotator(created.id);
+      toast('已新增标注员：' + created.name, 'ok');
+    } catch (err) { toast(err.message, 'err'); }
+  });
+  $('#annotatorTable').addEventListener('click', async (event) => {
+    const row = event.target.closest('[data-annotator]');
+    if (!row) return;
+    const id = Number(row.dataset.annotator);
+    if (event.target.matches('[data-use]')) {
+      setAnnotator(id);
+      toast('当前标注员已切换', 'ok');
+      return;
+    }
+    if (!event.target.matches('[data-save]')) return;
+    try {
+      await api(`/annotators/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          name: $('[data-f="name"]', row).value.trim(),
+          code: $('[data-f="code"]', row).value.trim(),
+          note: $('[data-f="note"]', row).value.trim(),
+          active: $('[data-f="active"]', row).checked
+        })
+      });
+      toast('标注员信息已保存', 'ok');
+      await loadAnnotators();
+    } catch (err) { toast(err.message, 'err'); }
+  });
+  $('#annotatorBadge').addEventListener('click', () => setView('annotators'));
+  $('#rvAnnotator').addEventListener('change', (event) => {
+    setAnnotator(Number(event.target.value) || null);
+  });
+}
+
+/* -------------------------------------------------- 工作台 */
+function bindWorkView() {
+  $('#goBatchBtn').addEventListener('click', () => setView('batch'));
+  $('#refreshImages').addEventListener('click', refreshBatchDetail);
+  $('#detectBtn').addEventListener('click', () => startDetect(false));
+  $('#continueBtn').addEventListener('click', () => {
+    if (!state.detail) return;
+    const next = state.detail.images.find(item => item.status !== 'DONE' && item.status !== 'ERROR');
+    if (!next) return toast('本批次图片已全部确认完成', 'ok');
+    openReview(next.id);
+  });
+  $('#dropzone').addEventListener('click', () => $('#imageFiles').click());
+  $('#imageFiles').addEventListener('change', (event) => {
+    const files = Array.from(event.target.files || []);
+    event.target.value = '';
+    uploadImages(files);
+  });
+  const zone = $('#dropzone');
+  ['dragenter', 'dragover'].forEach(name => zone.addEventListener(name, (event) => {
+    event.preventDefault(); zone.classList.add('drag');
+  }));
+  ['dragleave', 'drop'].forEach(name => zone.addEventListener(name, (event) => {
+    event.preventDefault(); zone.classList.remove('drag');
+  }));
+  zone.addEventListener('drop', (event) => {
+    const files = Array.from(event.dataTransfer.files || []).filter(file => file.type.startsWith('image/') || /\.(tif|tiff)$/i.test(file.name));
+    uploadImages(files);
+  });
+}
+
+async function uploadImages(files) {
+  if (!state.batch) return toast('请先选择批次', 'err');
+  if (!files.length) return;
+  const fd = new FormData();
+  files.forEach(file => fd.append('files', file));
+  toast(`正在上传 ${files.length} 张图片…`);
+  try {
+    const res = await api(`/batches/${state.batch.id}/images`, { method: 'POST', body: fd });
+    toast(`已导入 ${res.saved.length} 张图片${res.rejected.length ? '，失败 ' + res.rejected.length + ' 张' : ''}`,
+      res.rejected.length ? 'err' : 'ok');
+    if (res.rejected.length) toast(res.rejected.join('；'), 'err');
+    await loadBatches();
+    await refreshBatchDetail();
+  } catch (err) { toast(err.message, 'err'); }
+}
+
+async function refreshBatchDetail() {
+  if (!state.batch) return;
+  try {
+    const detail = await api(`/batches/${state.batch.id}`);
+    state.batch = detail.batch;
+    state.detail = detail;
+    renderBatchBadge();
+    renderWork();
+  } catch (err) { toast(err.message, 'err'); }
+}
+
+function renderWork() {
+  const hasBatch = !!state.batch;
+  $('#workEmpty').hidden = hasBatch;
+  $('#workBody').hidden = !hasBatch;
+  if (!hasBatch) return;
+  const batch = state.batch;
+  const detail = state.detail;
+  $('#workName').textContent = batch.name;
+  const statusEl = $('#workStatus');
+  statusEl.outerHTML = statusPill(batch.status).replace('class="pill', 'id="workStatus" class="pill');
+  $('#workMeta').innerHTML = `
+    <span>模型 <b>${esc(batch.model_name || '')}</b></span>
+    <span>AI 输出 <b>${batch.mode === 'BOX_ONLY' ? '仅候选框' : '类型建议'}</b></span>
+    ${batch.prompt ? `<span>提示词 <b>${esc(batch.prompt)}</b></span>` : ''}
+    <span>置信度 <b>${Number(batch.conf).toFixed(2)}</b></span>
+    <span>IoU <b>${Number(batch.iou).toFixed(2)}</b></span>
+    <span>图片 <b>${detail ? detail.images.length : 0}</b></span>
+    <span>待确认框 <b>${batch.pending_boxes}</b></span>
+    ${batch.error ? `<span style="color:#ff9aa6">错误：${esc(batch.error)}</span>` : ''}
+  `;
+  const detectBtn = $('#detectBtn');
+  const detected = ['DETECTED', 'REVIEWING', 'COMPLETED'].includes(batch.status);
+  detectBtn.textContent = detected ? '重新 AI 标注' : (batch.status === 'DETECTING' ? 'AI 标注中…' : '开始 AI 标注');
+  detectBtn.disabled = batch.status === 'DETECTING';
+  renderImages();
+  renderProgressFromBatch();
+}
+
+function renderImages() {
+  const grid = $('#imageGrid');
+  const images = state.detail ? state.detail.images : [];
+  const detected = images.filter(item => ['DETECTED', 'REVIEWING', 'DONE'].includes(item.status)).length;
+  const pending = images.reduce((sum, item) => sum + Number(item.pending || 0), 0);
+  $('#imageSummary').textContent = images.length
+    ? `${images.length} 张 · 已标注 ${detected} 张 · 待确认框 ${pending} 个` : '';
+  if (!images.length) {
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1">还没有图片，先把待标注图片拖进来。</div>';
+    return;
+  }
+  grid.innerHTML = images.map(item => `
+    <div class="img-card" data-img="${item.id}">
+      <div class="thumb">
+        <img src="${item.url}" loading="lazy" alt="${esc(item.filename)}">
+        <span class="st ${item.status === 'DONE' ? 'done' : (item.status === 'ERROR' ? 'err' : (item.status === 'UPLOADED' ? '' : 'pending'))}">${esc(IMG_STATUS[item.status] || item.status)}</span>
+      </div>
+      <div class="ic-body">
+        <span class="ic-name" title="${esc(item.filename)}">${esc(item.filename)}</span>
+        <span class="ic-meta">${item.box_count} 个框 · 待确认 ${item.pending}${item.width ? ' · ' + item.width + '×' + item.height : ''}</span>
+      </div>
+    </div>`).join('');
+  $$('[data-img]', grid).forEach(card => card.addEventListener('click', () => openReview(Number(card.dataset.img))));
+}
+
+function renderProgressFromBatch() {
+  const batch = state.batch;
+  if (!batch) return;
+  const wrap = $('#progressWrap');
+  if (!['DETECTING', 'FAILED'].includes(batch.status)) {
+    wrap.hidden = true;
+    return;
+  }
+  wrap.hidden = false;
+  const total = batch.total || 0;
+  const processed = batch.processed || 0;
+  const pct = total ? Math.round(processed / total * 100) : 0;
+  $('#progressLabel').textContent = batch.status === 'FAILED' ? '标注失败' : `AI 标注中 ${processed}/${total}`;
+  $('#progressPct').textContent = pct + '%';
+  $('#progressBar').style.width = pct + '%';
+  $('#progressCurrent').textContent = batch.error || (batch.status === 'DETECTING' ? '正在逐张推理，请稍候…' : '');
+}
+
+function applyProgress(progress) {
+  const wrap = $('#progressWrap');
+  wrap.hidden = false;
+  const total = progress.total || 0;
+  const processed = progress.processed || 0;
+  const pct = total ? Math.round(processed / total * 100) : 0;
+  $('#progressLabel').textContent = progress.status === 'FAILED' ? '标注失败' : `AI 标注中 ${processed}/${total}`;
+  $('#progressPct').textContent = pct + '%';
+  $('#progressBar').style.width = pct + '%';
+  $('#progressCurrent').textContent = progress.error || (progress.current ? '正在处理：' + progress.current : '');
+}
+
+function startPolling() {
+  stopPolling();
+  state.pollTimer = setInterval(async () => {
+    if (!state.batch) return stopPolling();
+    try {
+      const progress = await api(`/batches/${state.batch.id}/progress`);
+      applyProgress(progress);
+      if (progress.status !== 'RUNNING') {
+        stopPolling();
+        await loadBatches();
+        await refreshBatchDetail();
+        if (progress.status === 'FAILED') toast('AI 标注失败：' + (progress.error || ''), 'err');
+        else toast('AI 标注完成', 'ok');
+      }
+    } catch (err) {
+      stopPolling();
+      toast(err.message, 'err');
+    }
+  }, 1200);
+}
+
+function stopPolling() {
+  if (state.pollTimer) { clearInterval(state.pollTimer); state.pollTimer = null; }
+}
+
+async function startDetect(force) {
+  if (!state.batch) return;
+  try {
+    await api(`/batches/${state.batch.id}/detect`, {
+      method: 'POST', body: JSON.stringify({ force })
+    });
+    state.batch.status = 'DETECTING';
+    state.batch.processed = 0;
+    renderWork();
+    toast('已开始 AI 标注', 'ok');
+    startPolling();
+  } catch (err) {
+    if (!force && err.message.includes('人工确认')) {
+      if (confirm(err.message + '\n\n是否覆盖重新标注？')) return startDetect(true);
+      return;
+    }
+    toast(err.message, 'err');
+  }
+}
+
+/* -------------------------------------------------- 复核弹层 */
+function openReview(imageId) {
+  if (!state.detail) return;
+  const index = state.detail.images.findIndex(item => item.id === imageId);
+  if (index < 0) return;
+  state.review.index = index;
+  $('#reviewModal').hidden = false;
+  loadReviewImage();
+}
+
+function closeReview() {
+  setDrawMode(false);
+  $('#reviewModal').hidden = true;
+  state.review.detail = null;
+  state.selectedBoxId = null;
+  refreshBatchDetail();
+}
+
+async function loadReviewImage() {
+  setDrawMode(false);
+  const images = state.detail.images;
+  if (!images.length) return closeReview();
+  state.review.index = Math.max(0, Math.min(state.review.index, images.length - 1));
+  const meta = images[state.review.index];
+  try {
+    const detail = await api(`/images/${meta.id}`);
+    state.review.detail = detail;
+    if (!detail.boxes.some(box => box.id === state.selectedBoxId)) {
+      const pending = detail.boxes.find(box => box.decision === 'PENDING');
+      state.selectedBoxId = pending ? pending.id : (detail.boxes[0] ? detail.boxes[0].id : null);
+    }
+    renderReview();
+  } catch (err) { toast(err.message, 'err'); }
+}
+
+function renderReview() {
+  const detail = state.review.detail;
+  if (!detail) return;
+  const images = state.detail.images;
+  const meta = images[state.review.index];
+  $('#rvName').textContent = detail.filename;
+  $('#rvMeta').textContent = `${detail.width}×${detail.height} · ${detail.boxes.length} 个框 · ${IMG_STATUS[detail.status] || detail.status}` +
+    (detail.done_by_name ? ` · 完成人 ${detail.done_by_name}` : '');
+  $('#rvIndex').textContent = `${state.review.index + 1} / ${images.length}`;
+  $('#rvPrev').disabled = state.review.index <= 0;
+  $('#rvNext').disabled = state.review.index >= images.length - 1;
+
+  const img = $('#rvImg');
+  if (!img.getAttribute('src') || !img.src.endsWith(meta.url)) img.src = meta.url;
+
+  renderOverlay(detail);
+  renderBoxList(detail);
+  renderLegend();
+
+  $('#rvSummary').innerHTML = `
+    <span>待确认 <b style="color:#ffd27a">${detail.pending}</b></span>
+    <span>已接受 <b style="color:#7ee2ab">${detail.accepted}</b></span>
+    <span>已拒绝 <b>${detail.rejected}</b></span>
+  `;
+  const pending = detail.pending;
+  const boxOnly = state.batch && state.batch.mode === 'BOX_ONLY';
+  $('#rvAcceptAll').hidden = boxOnly;
+  $('#rvAcceptAll').disabled = pending === 0;
+  $('#rvDone').disabled = pending > 0;
+  $('#rvDone').textContent = pending > 0 ? `还有 ${pending} 个框待确认` : (detail.status === 'DONE' ? '已完成 ✓ 下一张' : '确认本图完成');
+  $('#rvDone').dataset.doneState = detail.status;
+}
+
+function boxStyle(box, detail) {
+  const w = detail.width || 1;
+  const h = detail.height || 1;
+  return `left:${(box.x1 / w * 100).toFixed(3)}%;top:${(box.y1 / h * 100).toFixed(3)}%;` +
+    `width:${Math.max(0.3, (box.x2 - box.x1) / w * 100).toFixed(3)}%;height:${Math.max(0.3, (box.y2 - box.y1) / h * 100).toFixed(3)}%`;
+}
+
+function boxColor(box) {
+  if (box.decision === 'REJECTED') return '#6b7a94';
+  if (box.decision === 'ACCEPTED') return (box.defect_type && box.defect_type.color) || '#25c26e';
+  return '#f5a524';
+}
+
+function boxCaption(box) {
+  if (box.decision === 'REJECTED') return '不是缺陷';
+  const score = box.score == null ? '' : ' ' + Number(box.score).toFixed(2);
+  if (box.source === 'MANUAL') return '人工框' + score;
+  if (box.defect_type) return box.defect_type.name + score;
+  if (state.batch && state.batch.mode === 'BOX_ONLY') return '候选框' + score;
+  return (box.ai_label || '未命名') + score;
+}
+
+function renderOverlay(detail) {
+  const wrap = $('#rvBoxes');
+  wrap.innerHTML = detail.boxes.map(box => {
+    const cls = 'obox ' + box.decision.toLowerCase() + (box.id === state.selectedBoxId ? ' selected' : '');
+    const style = boxStyle(box, detail) + `;border-color:${boxColor(box)}`;
+    const editable = box.decision === 'PENDING' && box.id === state.selectedBoxId;
+    const handles = editable
+      ? ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w']
+        .map(dir => `<span class="obox-handle ${dir}" data-handle="${dir}"></span>`).join('')
+      : '';
+    return `<div class="${cls}" data-box="${box.id}" style="${style}">
+      ${handles}
+      <span class="obox-label" style="background:${boxColor(box)}">${esc(boxCaption(box))}</span>
+    </div>`;
+  }).join('');
+  $$('[data-box]', wrap).forEach(el => {
+    el.addEventListener('click', (event) => {
+      event.stopPropagation();
+      selectBox(Number(el.dataset.box));
+    });
+    el.addEventListener('pointerdown', (event) => {
+      if (event.button !== 0) return;
+      const boxId = Number(el.dataset.box);
+      selectBox(boxId);
+      const dir = event.target.dataset && event.target.dataset.handle
+        ? event.target.dataset.handle : 'move';
+      startBoxDrag(event, boxId, dir);
+    });
+  });
+}
+
+let dragState = null;
+
+function startBoxDrag(event, boxId, dir) {
+  const detail = state.review.detail;
+  const box = detail && detail.boxes.find(item => item.id === boxId);
+  if (!box || box.decision !== 'PENDING') return;
+  const wrap = $('#rvBoxes');
+  const rect = wrap.getBoundingClientRect();
+  if (!rect.width || !rect.height) return;
+  event.preventDefault();
+  event.stopPropagation();
+  dragState = {
+    boxId, dir,
+    origin: { x1: box.x1, y1: box.y1, x2: box.x2, y2: box.y2 },
+    startX: event.clientX, startY: event.clientY,
+    scaleX: detail.width / rect.width,
+    scaleY: detail.height / rect.height,
+    width: detail.width, height: detail.height,
+    moved: false, next: null,
+  };
+  document.addEventListener('pointermove', onBoxDragMove);
+  document.addEventListener('pointerup', onBoxDragEnd, { once: true });
+}
+
+function onBoxDragMove(event) {
+  if (!dragState) return;
+  const dx = (event.clientX - dragState.startX) * dragState.scaleX;
+  const dy = (event.clientY - dragState.startY) * dragState.scaleY;
+  if (Math.abs(dx) + Math.abs(dy) > 0.5) dragState.moved = true;
+  const width = dragState.width;
+  const height = dragState.height;
+  const dir = dragState.dir;
+  const min = 4;
+  let { x1, y1, x2, y2 } = dragState.origin;
+  if (dir === 'move') {
+    const boxWidth = x2 - x1;
+    const boxHeight = y2 - y1;
+    x1 = Math.max(0, Math.min(x1 + dx, Math.max(0, width - boxWidth)));
+    y1 = Math.max(0, Math.min(y1 + dy, Math.max(0, height - boxHeight)));
+    x2 = x1 + boxWidth;
+    y2 = y1 + boxHeight;
+  } else {
+    if (dir.includes('w')) x1 = Math.max(0, Math.min(x1 + dx, x2 - min));
+    if (dir.includes('e')) x2 = Math.min(width, Math.max(x2 + dx, x1 + min));
+    if (dir.includes('n')) y1 = Math.max(0, Math.min(y1 + dy, y2 - min));
+    if (dir.includes('s')) y2 = Math.min(height, Math.max(y2 + dy, y1 + min));
+  }
+  dragState.next = { x1, y1, x2, y2 };
+  const el = $(`#rvBoxes .obox[data-box="${dragState.boxId}"]`);
+  if (el) {
+    el.style.left = (x1 / width * 100).toFixed(3) + '%';
+    el.style.top = (y1 / height * 100).toFixed(3) + '%';
+    el.style.width = ((x2 - x1) / width * 100).toFixed(3) + '%';
+    el.style.height = ((y2 - y1) / height * 100).toFixed(3) + '%';
+  }
+}
+
+async function onBoxDragEnd() {
+  document.removeEventListener('pointermove', onBoxDragMove);
+  const current = dragState;
+  dragState = null;
+  if (!current || !current.moved || !current.next) return;
+  const { x1, y1, x2, y2 } = current.next;
+  await patchBox(current.boxId, {
+    x1: Number(x1.toFixed(2)),
+    y1: Number(y1.toFixed(2)),
+    x2: Number(x2.toFixed(2)),
+    y2: Number(y2.toFixed(2)),
+  });
+  const saved = state.review.detail && state.review.detail.boxes.find(item => item.id === current.boxId);
+  if (saved && Math.abs(saved.x1 - x1) < 1 && Math.abs(saved.y2 - y2) < 1) {
+    toast('框范围已保存', 'ok');
+  }
+}
+
+let drawMode = false;
+
+function setDrawMode(enabled) {
+  drawMode = Boolean(enabled) && Boolean(state.review.detail);
+  const wrap = $('#rvBoxes');
+  if (wrap) wrap.classList.toggle('draw-mode', drawMode);
+  const button = $('#rvAddBox');
+  if (button) button.textContent = drawMode ? '取消新增' : '＋ 新增框';
+  if (!drawMode) cancelDrawPreview();
+}
+
+function cancelDrawPreview() {
+  const wrap = $('#rvBoxes');
+  const preview = wrap && wrap.querySelector('.draw-box');
+  if (preview) preview.remove();
+  drawState = null;
+}
+
+let drawState = null;
+
+function onCanvasDrawStart(event) {
+  if (!drawMode || event.button !== 0) return;
+  const detail = state.review.detail;
+  if (!detail) return;
+  const wrap = $('#rvBoxes');
+  const rect = wrap.getBoundingClientRect();
+  if (!rect.width || !rect.height) return;
+  const point = canvasPoint(event, rect, detail);
+  const preview = document.createElement('div');
+  preview.className = 'draw-box';
+  preview.style.left = (point.x / detail.width * 100).toFixed(3) + '%';
+  preview.style.top = (point.y / detail.height * 100).toFixed(3) + '%';
+  preview.style.width = '0%';
+  preview.style.height = '0%';
+  wrap.appendChild(preview);
+  drawState = { detail, rect, start: point, end: point, preview };
+  event.preventDefault();
+  document.addEventListener('pointermove', onCanvasDrawMove);
+  document.addEventListener('pointerup', onCanvasDrawEnd, { once: true });
+}
+
+function canvasPoint(event, rect, detail) {
+  return {
+    x: Math.max(0, Math.min(detail.width, (event.clientX - rect.left) * detail.width / rect.width)),
+    y: Math.max(0, Math.min(detail.height, (event.clientY - rect.top) * detail.height / rect.height)),
+  };
+}
+
+function onCanvasDrawMove(event) {
+  if (!drawState) return;
+  const { rect, detail, start, preview } = drawState;
+  const point = canvasPoint(event, rect, detail);
+  drawState.end = point;
+  const x1 = Math.min(start.x, point.x);
+  const y1 = Math.min(start.y, point.y);
+  const x2 = Math.max(start.x, point.x);
+  const y2 = Math.max(start.y, point.y);
+  preview.style.left = (x1 / detail.width * 100).toFixed(3) + '%';
+  preview.style.top = (y1 / detail.height * 100).toFixed(3) + '%';
+  preview.style.width = ((x2 - x1) / detail.width * 100).toFixed(3) + '%';
+  preview.style.height = ((y2 - y1) / detail.height * 100).toFixed(3) + '%';
+}
+
+async function onCanvasDrawEnd() {
+  document.removeEventListener('pointermove', onCanvasDrawMove);
+  const current = drawState;
+  drawState = null;
+  if (!current) return;
+  const { start, end, detail, preview } = current;
+  preview.remove();
+  const x1 = Math.min(start.x, end.x);
+  const y1 = Math.min(start.y, end.y);
+  const x2 = Math.max(start.x, end.x);
+  const y2 = Math.max(start.y, end.y);
+  if (x2 - x1 < 6 || y2 - y1 < 6) {
+    toast('框太小，请重新画', 'err');
+    return;
+  }
+  setDrawMode(false);
+  try {
+    const data = await api(`/images/${detail.id}/boxes`, {
+      method: 'POST',
+      body: JSON.stringify({
+        x1: Number(x1.toFixed(2)),
+        y1: Number(y1.toFixed(2)),
+        x2: Number(x2.toFixed(2)),
+        y2: Number(y2.toFixed(2)),
+      }),
+    });
+    state.review.detail = data.image;
+    state.selectedBoxId = data.box_id;
+    renderReview();
+    toast('已新增框，请选择缺陷类型', 'ok');
+  } catch (err) {
+    toast(err.message, 'err');
+  }
+}
+
+function renderBoxList(detail) {
+  const list = $('#rvList');
+  const options = activeTypes();
+  if (!detail.boxes.length) {
+    list.innerHTML = '<div class="empty">AI 未检测到候选框。确认无缺陷后可点「确认本图完成」。</div>';
+    return;
+  }
+  list.innerHTML = detail.boxes.map((box, index) => {
+    const tagCls = box.decision.toLowerCase();
+    const tagText = box.decision === 'PENDING' ? '待确认' : (box.decision === 'ACCEPTED' ? '已接受' : '不是缺陷');
+    const selected = box.id === state.selectedBoxId ? ' selected' : '';
+    const typeOptions = options.map(type =>
+      `<option value="${type.id}" ${box.defect_type_id === type.id && box.decision !== 'REJECTED' ? 'selected' : ''}>${esc(type.name)}</option>`
+    ).join('');
+    const aiText = box.source === 'MANUAL'
+      ? '人工新增'
+      : (state.batch && state.batch.mode === 'BOX_ONLY'
+        ? '候选框' : 'AI：' + esc(box.ai_label || '—'));
+    return `<div class="box-item${selected}" data-id="${box.id}">
+      <div class="bi-head">
+        <span class="dot" style="background:${boxColor(box)}"></span>
+        <span class="idx">#${index + 1}</span>
+        <span>${aiText}</span>
+        ${box.reviewer ? `<span class="who" title="确认时间 ${esc(box.reviewed_at || '')}">${esc(box.reviewer.name)}</span>` : ''}
+        <span class="score">${box.score == null ? '' : Number(box.score).toFixed(3)}</span>
+      </div>
+      <div class="bi-row">
+        <select data-type>
+          <option value="" ${!box.defect_type_id && box.decision !== 'REJECTED' ? 'selected' : ''}>选择缺陷类型…</option>
+          <option value="none" ${box.decision === 'REJECTED' ? 'selected' : ''}>不是缺陷</option>
+          ${typeOptions}
+        </select>
+        <button class="btn small" data-accept>接受</button>
+        <button class="btn small ghost" data-reject>不是缺陷</button>
+        <span class="tag ${tagCls}">${tagText}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderLegend() {
+  const legend = $('#rvLegend');
+  if (!legend) return;
+  const options = activeTypes();
+  legend.innerHTML = options.map((type, index) =>
+    `<span><i class="dot" style="background:${esc(type.color)}"></i>${index + 1}. ${esc(type.name)}</span>`).join('');
+}
+
+function selectBox(boxId) {
+  const changed = state.selectedBoxId !== boxId;
+  state.selectedBoxId = boxId;
+  const detail = state.review.detail;
+  if (!detail) return;
+  $$('#rvBoxes .obox').forEach(el => el.classList.toggle('selected', Number(el.dataset.box) === boxId));
+  $$('#rvList .box-item').forEach(el => el.classList.toggle('selected', Number(el.dataset.id) === boxId));
+  const item = $('#rvList .box-item.selected');
+  if (item) item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  if (changed) renderOverlay(detail);
+}
+
+async function patchBox(boxId, payload) {
+  if (payload.decision && payload.decision !== 'PENDING') {
+    const annotatorId = ensureAnnotator();
+    if (!annotatorId) return;
+    payload.annotator_id = annotatorId;
+  }
+  try {
+    const detail = await api(`/boxes/${boxId}`, { method: 'PATCH', body: JSON.stringify(payload) });
+    state.review.detail = detail;
+    state.selectedBoxId = boxId;
+    syncGridFromDetail(detail);
+    renderReview();
+  } catch (err) {
+    toast(err.message, 'err');
+    if (state.review.detail) renderOverlay(state.review.detail);
+  }
+}
+
+function syncGridFromDetail(detail) {
+  if (!state.detail) return;
+  const target = state.detail.images.find(item => item.id === detail.id);
+  if (!target) return;
+  target.status = detail.status;
+  target.pending = detail.pending;
+  target.accepted = detail.accepted;
+  target.rejected = detail.rejected;
+  target.box_count = detail.boxes.length;
+  const pendingAll = state.detail.images.reduce((sum, item) => sum + Number(item.pending || 0), 0);
+  state.batch.pending_boxes = pendingAll;
+  renderImages();
+}
+
+async function acceptAllSuggestions() {
+  const detail = state.review.detail;
+  if (!detail) return;
+  const annotatorId = ensureAnnotator();
+  if (!annotatorId) return;
+  try {
+    const updated = await api(`/images/${detail.id}/accept-suggested`, {
+      method: 'POST', body: JSON.stringify({ annotator_id: annotatorId })
+    });
+    state.review.detail = updated;
+    syncGridFromDetail(updated);
+    renderReview();
+    toast('已接受全部建议类型', 'ok');
+  } catch (err) { toast(err.message, 'err'); }
+}
+
+async function markImageDone() {
+  const detail = state.review.detail;
+  if (!detail) return;
+  const annotatorId = ensureAnnotator();
+  if (!annotatorId) return;
+  try {
+    const updated = await api(`/images/${detail.id}/done`, {
+      method: 'POST', body: JSON.stringify({ annotator_id: annotatorId })
+    });
+    state.review.detail = updated;
+    syncGridFromDetail(updated);
+    toast('本图已完成', 'ok');
+    renderReview();
+    if (state.review.index < state.detail.images.length - 1) {
+      state.review.index += 1;
+      await loadReviewImage();
+    } else {
+      await refreshBatchDetail();
+    }
+  } catch (err) { toast(err.message, 'err'); }
+}
+
+function bindReview() {
+  $('#rvClose').addEventListener('click', closeReview);
+  $('#rvPrev').addEventListener('click', async () => {
+    if (state.review.index <= 0) return;
+    state.review.index -= 1;
+    await loadReviewImage();
+  });
+  $('#rvNext').addEventListener('click', async () => {
+    if (state.review.index >= state.detail.images.length - 1) return;
+    state.review.index += 1;
+    await loadReviewImage();
+  });
+  $('#rvAcceptAll').addEventListener('click', acceptAllSuggestions);
+  $('#rvAddBox').addEventListener('click', () => setDrawMode(!drawMode));
+  $('#rvBoxes').addEventListener('pointerdown', onCanvasDrawStart);
+  $('#rvDone').addEventListener('click', () => {
+    if (state.review.detail && state.review.detail.status === 'DONE' && state.review.detail.pending === 0) {
+      $('#rvNext').click();
+      return;
+    }
+    markImageDone();
+  });
+  $('#rvList').addEventListener('click', (event) => {
+    const item = event.target.closest('.box-item');
+    if (!item) return;
+    const boxId = Number(item.dataset.id);
+    if (event.target.matches('[data-accept]')) {
+      const select = $('select[data-type]', item);
+      if (!select.value || select.value === 'none') return toast('请先选择缺陷类型', 'err');
+      return patchBox(boxId, { decision: 'ACCEPTED', defect_type_id: Number(select.value) });
+    }
+    if (event.target.matches('[data-reject]')) return patchBox(boxId, { decision: 'REJECTED' });
+    if (event.target.tagName === 'SELECT' || event.target.tagName === 'OPTION') return;
+    selectBox(boxId);
+  });
+  $('#rvList').addEventListener('change', (event) => {
+    if (!event.target.matches('select[data-type]')) return;
+    const item = event.target.closest('.box-item');
+    if (!item) return;
+    if (event.target.value === 'none') {
+      patchBox(Number(item.dataset.id), { decision: 'REJECTED' });
+      return;
+    }
+    const value = Number(event.target.value);
+    if (!value) return;
+    patchBox(Number(item.dataset.id), { decision: 'ACCEPTED', defect_type_id: value });
+  });
+  $('#reviewModal').addEventListener('click', (event) => {
+    if (event.target.id === 'reviewModal') closeReview();
+  });
+  document.addEventListener('keydown', (event) => {
+    if ($('#reviewModal').hidden) return;
+    const tag = (event.target.tagName || '').toLowerCase();
+    if (['input', 'select', 'textarea'].includes(tag)) return;
+    const detail = state.review.detail;
+    if (!detail) return;
+    if (event.key === 'Escape') {
+      if (drawMode) { setDrawMode(false); return; }
+      closeReview();
+      return;
+    }
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      const boxes = detail.boxes;
+      if (!boxes.length) return;
+      const idx = boxes.findIndex(box => box.id === state.selectedBoxId);
+      const next = event.key === 'ArrowDown' ? Math.min(boxes.length - 1, idx + 1) : Math.max(0, idx - 1);
+      event.preventDefault();
+      return selectBox(boxes[next].id);
+    }
+    if (!state.selectedBoxId) return;
+    if (/^[1-9]$/.test(event.key)) {
+      const type = activeTypes()[Number(event.key) - 1];
+      if (type) patchBox(state.selectedBoxId, { decision: 'ACCEPTED', defect_type_id: type.id });
+      return;
+    }
+    const key = event.key.toLowerCase();
+    if (key === 'r' || key === 'x') {
+      patchBox(state.selectedBoxId, { decision: 'REJECTED' });
+    } else if (key === 'a') {
+      const box = detail.boxes.find(item => item.id === state.selectedBoxId);
+      if (!box || !box.defect_type_id) return toast('该框没有建议类型，请用 1-9 选择', 'err');
+      patchBox(box.id, { decision: 'ACCEPTED', defect_type_id: box.defect_type_id });
+    }
+  });
+}
+
+/* -------------------------------------------------- 统计与导出 */
+async function loadStats() {
+  const empty = $('#statsEmpty');
+  const body = $('#statsBody');
+  if (!state.batch) {
+    empty.hidden = false; body.hidden = true;
+    return;
+  }
+  empty.hidden = true; body.hidden = false;
+  try {
+    state.stats = await api(`/batches/${state.batch.id}/stats`);
+  } catch (err) {
+    toast(err.message, 'err');
+    return;
+  }
+  renderStats(state.stats);
+}
+
+function renderStats(stats) {
+  $('#statsSub').textContent = `${stats.name} · ${stats.model ? stats.model.name : ''} · ${STATUS_TEXT[stats.status] || stats.status}`;
+  const cards = [
+    ['图片总数', stats.images, '张'],
+    ['已完成图片', stats.images_done, '张'],
+    ['候选框', stats.boxes, '个'],
+    ['已接受', stats.accepted, '个'],
+    ['不是缺陷', stats.rejected, '个'],
+    ['待确认', stats.pending, '个'],
+    ['接受率', (stats.accept_rate * 100).toFixed(1), '%'],
+    ['平均置信度', stats.avg_score == null ? '—' : stats.avg_score.toFixed(3), '']
+  ];
+  $('#statCards').innerHTML = cards.map(([key, value, unit]) =>
+    `<div class="stat"><div class="k">${key}</div><div class="v">${value}<small>${unit}</small></div></div>`).join('');
+
+  const bars = $('#typeBars');
+  if (!stats.by_type.length) {
+    bars.innerHTML = '<div class="empty">还没有已接受的缺陷框</div>';
+  } else {
+    const max = Math.max(...stats.by_type.map(item => item.count));
+    bars.innerHTML = stats.by_type.map(item => `
+      <div class="type-row">
+        <span class="name"><i class="dot" style="background:${esc(item.color)}"></i>${esc(item.name)}</span>
+        <span class="type-track"><span class="type-fill" style="width:${Math.round(item.count / max * 100)}%;background:${esc(item.color)}"></span></span>
+        <span class="n">${item.count}</span>
+      </div>`).join('');
+  }
+
+  const list = $('#exportList');
+  list.innerHTML = stats.exports.length ? stats.exports.map(item => `
+    <div class="export-item">
+      <span><a href="/api/exports/${encodeURIComponent(item.filename)}" download>${esc(item.filename)}</a>
+        <span class="hint"> · ${esc(item.created_at)}</span></span>
+      <span class="pill ok">ZIP</span>
+    </div>`).join('') : '<div class="empty">还没有导出记录</div>';
+
+  const annotatorRows = (stats.by_annotator || []).map(item => `<tr>
+    <td><strong>${esc(item.name)}</strong></td>
+    <td>${esc(item.code || '—')}</td>
+    <td>${item.accepted}</td>
+    <td>${item.rejected}</td>
+    <td>${item.done_images}</td>
+    <td>${item.active ? '<span class="pill ok">启用</span>' : '<span class="pill">停用</span>'}</td>
+  </tr>`).join('');
+  const unassigned = Number(stats.unassigned_boxes || 0);
+  $('#annotatorStatsSub').textContent = unassigned ? `另有 ${unassigned} 个历史确认框未记录标注员` : '';
+  $('#annotatorStats').innerHTML = annotatorRows
+    ? `<table><thead><tr><th>姓名</th><th>工号</th><th>接受框</th><th>拒绝框</th><th>完成图片</th><th>状态</th></tr></thead>
+       <tbody>${annotatorRows}</tbody></table>`
+    : '<div class="empty">还没有标注员记录</div>';
+}
+
+function bindStatsView() {
+  $('#refreshStats').addEventListener('click', loadStats);
+  $('#exportBtn').addEventListener('click', async () => {
+    if (!state.batch) return toast('请先选择批次', 'err');
+    const btn = $('#exportBtn');
+    btn.disabled = true;
+    btn.textContent = '正在打包…';
+    try {
+      const res = await api(`/batches/${state.batch.id}/export`, { method: 'POST' });
+      toast('导出完成：' + res.filename, 'ok');
+      const link = document.createElement('a');
+      link.href = res.url;
+      link.download = res.filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      state.stats = null;
+      await loadStats();
+    } catch (err) {
+      toast(err.message, 'err');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '导出本批次 ZIP';
+    }
+  });
+}
+
+/* -------------------------------------------------- 启动 */
+async function boot() {
+  bindNav();
+  bindBatchView();
+  bindTypesView();
+  bindAnnotatorsView();
+  bindWorkView();
+  bindStatsView();
+  bindReview();
+  await Promise.all([loadHealth(), loadTypes(), loadAnnotators(), loadModels(), loadBatches()]);
+  const saved = Number(localStorage.getItem('labeler.batchId'));
+  if (saved) await selectBatch(saved, true);
+  else renderWork();
+  renderBatchBadge();
+}
+
+boot();
+</script>
+</body>
+</html>
